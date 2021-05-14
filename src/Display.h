@@ -4,19 +4,26 @@
 #include <GxEPD2_BW.h>
 #include <GxEPD2_3C.h>
 
+#include <Fonts/FreeMono9pt7b.h>
+#include <Fonts/FreeMonoBold12pt7b.h>
+
 #include "pins.h"
 
 #define DISPLAY_ORIENT_LANDSCAPE 0
 #define DISPLAY_ORIENT_PORTRAIT 1
 
 #ifndef DisplayT
-#  define DisplayT GxEPD2_BW<GxEPD2_750_T7, GxEPD2_750_T7::HEIGHT>
+   // Can be overridden at compile time, but by default it configures the
+   // display to be a black&white Waveshare 7.5 inches (800x480).
+   // https://www.waveshare.com/wiki/7.5inch_e-Paper_HAT
+#  define __DisplayType GxEPD2_750_T7
+#  define DisplayT GxEPD2_BW<__DisplayType, __DisplayType::HEIGHT>
 #endif
 
 class Display {
 public:
   void begin(uint32_t serial_baud_rate = 115200) {
-    this->display = new DisplayT(GxEPD2_750_T7(
+    this->display = new DisplayT(__DisplayType(
       SPI_CS,
       SPI_DC,
       SPI_RST,
