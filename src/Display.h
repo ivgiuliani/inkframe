@@ -23,23 +23,20 @@
 class Display {
 public:
   void begin(uint32_t serial_baud_rate = 115200, uint reset_duration = 2) {
+    // Reconfigure SPI pins to point at SCK(13), MISO(12), MOSI(14) and SS(15)
+    // as that's the configuration recommended from Waveshare for ESP32s.
+    SPI.end();
+    SPI.begin(13, 12, 14, 15);
+
     this->display = new DisplayT(__DisplayType(SPI_CS, SPI_DC, SPI_RST, SPI_BUSY));
     this->display->init(serial_baud_rate, true, reset_duration);
 
-    // Release standard SPI pins, e.g. SCK(18), MISO(19), MOSI(23), SS(5)
-    SPI.end();
-
-    // Map and init SPI pins SCK(13), MISO(12), MOSI(14), SS(15) - adjusted to the
-    // recommended PIN settings from Waveshare - note that this is not the default
-    // for most screens
-    SPI.begin(13, 12, 14, 15);
-
-    // Set some defaults and clear things out for the first page.
+    // Set some defaults and clear things out for the initial boot.
     new_frame();
     this->display->firstPage();
   }
 
-  // Sets some useful defaults for an empty new frame
+  // Sets some decent defaults for an empty new frame
   inline void new_frame() {
     this->display->setCursor(0, 0);
     this->display->setRotation(DISPLAY_ORIENT_PORTRAIT);
