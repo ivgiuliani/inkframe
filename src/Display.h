@@ -29,7 +29,10 @@ public:
     SPI.begin(13, 12, 14, 15);
 
     this->display = new DisplayT(__DisplayType(SPI_CS, SPI_DC, SPI_RST, SPI_BUSY));
-    this->display->init(serial_baud_rate, true, reset_duration);
+
+    // Seems like the only valid configuration for the Waveshare board I have
+    // is init(115200, true, 2, false) as recommended by GxEDP2.
+    this->display->init(serial_baud_rate, true, reset_duration, false);
 
     // Set some defaults and clear things out for the initial boot.
     new_frame();
