@@ -39,6 +39,7 @@ public:
 
   // Sets some useful defaults for an empty new frame
   inline void new_frame() {
+    this->display->setCursor(0, 0);
     this->display->setRotation(DISPLAY_ORIENT_PORTRAIT);
     this->display->fillScreen(GxEPD_WHITE);
     this->display->setTextColor(GxEPD_BLACK);
