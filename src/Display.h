@@ -22,14 +22,9 @@
 
 class Display {
 public:
-  void begin(uint32_t serial_baud_rate = 115200) {
-    this->display = new DisplayT(__DisplayType(
-      SPI_CS,
-      SPI_DC,
-      SPI_RST,
-      SPI_BUSY
-    ));
-    this->display->init(serial_baud_rate, true, 2); 
+  void begin(uint32_t serial_baud_rate = 115200, uint reset_duration = 2) {
+    this->display = new DisplayT(__DisplayType(SPI_CS, SPI_DC, SPI_RST, SPI_BUSY));
+    this->display->init(serial_baud_rate, true, reset_duration);
 
     // Release standard SPI pins, e.g. SCK(18), MISO(19), MOSI(23), SS(5)
     SPI.end();
