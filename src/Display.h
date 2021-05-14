@@ -33,15 +33,24 @@ public:
     SPI.begin(13, 12, 14, 15);
 
     // Set some defaults and clear things out for the first page.
-    set_display_defaults();
+    new_frame();
     this->display->firstPage();
   }
 
-  inline void set_display_defaults() {
+  // Sets some useful defaults for an empty new frame
+  inline void new_frame() {
     this->display->setRotation(DISPLAY_ORIENT_PORTRAIT);
     this->display->fillScreen(GxEPD_WHITE);
     this->display->setTextColor(GxEPD_BLACK);
-    this->display->setTextWrap(true);
+    this->display->setFullWindow();
+    this->display->setPartialWindow(
+      0, 0, this->display->width(), this->display->height()
+    );
+
+    // Text wrap is disabled by default because if something wraps it messes
+    // up everything else, so in that case we try to minimise the broken
+    // display artefacts.
+    this->display->setTextWrap(false);
   }
 
   inline DisplayT *get_display() {
