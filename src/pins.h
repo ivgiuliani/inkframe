@@ -3,7 +3,9 @@
 
 // Pin configuration for the wroom32 board.
 
-#define LED_BUILTIN 2
+#if !defined(LED_BUILTIN)
+#  define LED_BUILTIN 2
+#endif
 
 #define SPI_CS 15
 #define SPI_DC 27
