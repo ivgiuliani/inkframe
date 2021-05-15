@@ -5,12 +5,14 @@
 #  include <Arduino.h>
 #endif
 
-struct bmp_pixel {
+struct bmp_pixel_rgba_t {
   uint8_t alpha;
   uint8_t r;
   uint8_t g;
   uint8_t b;
 };
+
+typedef uint8_t bmp_pixel_bw_t;
 
 struct __attribute__((__packed__)) bmp_file_header_t {
   char signature[2]; // Must always be 'BM'
@@ -48,14 +50,15 @@ public:
     if (x > width()) throw "Requested X coordinate exceeds boundaries";
     if (y > height()) throw "Requested Y coordinate exceeds boundaries";
 
-    struct bmp_pixel pixel = raw_pixel(x, y);
-
-    // TODO: improve B&W threshold calculation
-    if ((pixel.alpha> 0) || ((pixel.r + pixel.g + pixel.b) > 100)) {
-      return 1;
+    if (image_header.bpp >= 24 && binarisation_threshold < 0) {
+      // As this is an expensive operation, only do it when we read the first
+      // pixel and then cache the value.
+      binarisation_threshold = calculate_binarisation_threshold();
+    } else {
+      binarisation_threshold = 255 / 2;
     }
 
-    return 0;
+    return (rgba_to_grayscale(raw_pixel(x, y)) > binarisation_threshold ? 1 : 0);
   }
 
   const inline uint32_t width() {
@@ -74,15 +77,98 @@ private:
   bmp_file_header_t file_header;
   bmp_image_header_t image_header;
 
+  int8_t binarisation_threshold = -1;
+
+  #ifndef __bmp_pixel_size
+  #  define __bmp_pixel_size() ((image_header.bpp / 8))
+  #endif
+
+  #ifndef __bmp_scan_line_size
+  #  define __bmp_scan_line_size() \
+    ( \
+      (image_header.image_width * __bmp_pixel_size() + 3) & (~3) \
+    )
+  #endif
+
   void parse_headers() {
     // We ignore the color pallet block as we only support 24 and 32 bits BMPs.
     memcpy(&file_header, bitmap, sizeof(struct bmp_file_header_t));
     memcpy(&image_header, bitmap + sizeof(struct bmp_file_header_t), sizeof(struct bmp_image_header_t));
   }
 
-  struct bmp_pixel raw_pixel(uint32_t x, uint32_t y) {
-    struct bmp_pixel pixel;
+  uint8_t calculate_binarisation_threshold() {
+    // This method uses a single-pass adaptive thresholding to calculate the
+    // binarisation threshold (pixels with luminance < this threshold will be
+    // black): https://en.wikipedia.org/wiki/Thresholding_(image_processing)#Automatic_thresholding
+    const uint16_t pixel_count = width() * height();
+    uint32_t running_luminance_sum = 0;
+    uint16_t foreground_pixels = 0;
+    uint32_t foreground_luminance_sum = 0;
+    uint16_t background_pixels = 0;
+    uint32_t background_luminance_sum = 0;
+    const unsigned char *scan_line;
 
+    // First pass: calculate the average luminance
+    for (uint16_t y = 0; y < height(); y++) {
+      scan_line = scan_line_offset(y);
+      unsigned char *pixel_start = const_cast<unsigned char *>(scan_line);
+
+      for(uint16_t x = 0; x < width(); x++) {
+        running_luminance_sum += rgba_to_grayscale(unpack_rgba_pixel(pixel_start));
+        pixel_start += __bmp_pixel_size();
+      }
+    }
+    const uint8_t average_luminance = running_luminance_sum / pixel_count;
+
+    // Second pass: calculate two averages: one for background and one for
+    // foreground pixels
+    for (uint16_t y = 0; y < height(); y++) {
+      scan_line = scan_line_offset(y);
+      unsigned char *pixel_start = const_cast<unsigned char *>(scan_line);
+
+      for(uint16_t x = 0; x < width(); x++) {
+        bmp_pixel_bw_t luminance = rgba_to_grayscale(unpack_rgba_pixel(pixel_start));
+        if (luminance < average_luminance) {
+          background_pixels++;
+          background_luminance_sum += luminance;
+        } else {
+          foreground_pixels++;
+          foreground_luminance_sum += luminance;
+        }
+        pixel_start += __bmp_pixel_size();
+      }
+    }
+
+    const uint8_t foreground_luminance = foreground_luminance_sum / foreground_pixels;
+    const uint8_t background_luminance = background_luminance_sum / background_pixels;
+
+    return (foreground_luminance + background_luminance) / 2;
+  }
+
+  bmp_pixel_bw_t rgba_to_grayscale(struct bmp_pixel_rgba_t pixel) {
+    // https://en.wikipedia.org/wiki/Grayscale#Luma_coding_in_video_systems
+    const int16_t luminance = 0.2627 * pixel.r +
+                              0.6780 * pixel.g +
+                              0.0593 * pixel.b;
+
+    if (luminance > 255) {
+      // Account for floating point rounding errors
+      return 255;
+    }
+
+    return luminance;
+  }
+
+  struct bmp_pixel_rgba_t raw_pixel(uint32_t x, uint32_t y) {
+    const unsigned char *scan_line = scan_line_offset(y);
+    const unsigned char *pixel_start = scan_line + x * __bmp_pixel_size();
+
+    struct bmp_pixel_rgba_t pixel = unpack_rgba_pixel(pixel_start);
+
+    return pixel;
+  }
+
+  inline const unsigned char *scan_line_offset(uint16_t y_index) {
     // Bitmaps start from the bottom left corner so the last row in the file is
     // actually the top row visually. I.e. usually the file follows this layout:
     //
@@ -98,32 +184,32 @@ private:
     // p9  p10 p11 p12
     // p13 p14 p15 p16
     const bool flip_scan_lines = image_header.image_height < 0;
-    const uint8_t pixel_size = image_header.bpp / 8;
     const unsigned char *scan_line;
 
-    // Rows are always padded to 4 bytes
-    const uint32_t scan_line_size = (image_header.image_width * pixel_size + 3) & (~3);
-
     if (!flip_scan_lines) {
-      scan_line = (bitmap + file_header.image_offset) + (height() - 1 - y) * scan_line_size;
+      scan_line = (bitmap + file_header.image_offset) + (height() - 1 - y_index) * __bmp_scan_line_size();
     } else {
-      scan_line = (bitmap + file_header.image_offset) + (scan_line_size * y);
+      scan_line = (bitmap + file_header.image_offset) + (__bmp_scan_line_size() * y_index);
     }
 
-    const unsigned char *pixel_start = scan_line + x * pixel_size;
+    return scan_line;
+  }
+
+  const struct bmp_pixel_rgba_t unpack_rgba_pixel(const unsigned char *offset) {
+    struct bmp_pixel_rgba_t pixel;
 
     // BMP uses little endian, thus bytes are stored as (A)RGB rather than RGB(A)
     if (image_header.bpp < 32) {
       pixel.alpha = 0;
-      pixel.g = *(pixel_start + 0);
-      pixel.b = *(pixel_start + 1);
-      pixel.r = *(pixel_start + 2);
+      pixel.g = *(offset + 0);
+      pixel.b = *(offset + 1);
+      pixel.r = *(offset + 2);
     } else {
       // 32bit bitmaps include the alpha channel
-      pixel.alpha = *(pixel_start + 0);
-      pixel.g = *(pixel_start + 1);
-      pixel.b = *(pixel_start + 2);
-      pixel.r = *(pixel_start + 3);
+      pixel.alpha = *(offset + 0);
+      pixel.g = *(offset + 1);
+      pixel.b = *(offset + 2);
+      pixel.r = *(offset + 3);
     }
 
     return pixel;
