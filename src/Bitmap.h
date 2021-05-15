@@ -1,6 +1,8 @@
 #ifndef __BITMAP_H
 #define __BITMAP_H
 
+#include "Errors.h"
+
 #ifdef ESP32
 #  include <Arduino.h>
 #endif
@@ -48,8 +50,8 @@ public:
   }
 
   uint8_t read_pixel(uint32_t x, uint32_t y) {
-    if (x > width()) throw "Requested X coordinate exceeds boundaries";
-    if (y > height()) throw "Requested Y coordinate exceeds boundaries";
+    if (x > width()) PANIC(F("Requested X coordinate exceeds image boundaries"));
+    if (y > height()) PANIC(F("Requested Y coordinate exceeds image boundaries"));
 
     if (image_header.bpp >= 24 && binarisation_threshold < 0) {
       // As this is an expensive operation, only do it when we read the first
