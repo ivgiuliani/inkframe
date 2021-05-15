@@ -8,7 +8,10 @@
 #endif
 
 struct bmp_pixel_rgba_t {
+  // For non-rgb(a) images (e.g. monochrome or paletted bitmaps), we store
+  // the intensity of the color in the alpha channel.
   uint8_t alpha;
+
   uint8_t r;
   uint8_t g;
   uint8_t b;
@@ -37,6 +40,11 @@ struct __attribute__((__packed__)) bmp_image_header_t {
   uint32_t important_colors;
 };
 
+// Simple bitmap handler class for bitmaps to be displayed on the e-ink screen.
+// Currently only 8, 24 and 32 bit bitmaps are supported.
+// For 24 and 32 bit bitmaps, an adaptive threshold binarisation process is
+// applied to automatically convert the image to black and white without too
+// much loss of quality.
 class Bitmap {
 public:
   Bitmap(const unsigned char *bitmap, bool invert = false) {
@@ -103,7 +111,7 @@ private:
   #endif
 
   void parse_headers() {
-    // We ignore the color pallet block as we only support 24 and 32 bits BMPs.
+    // We ignore the color pallet block as we only support 8, 24 and 32 bits BMPs.
     memcpy(&file_header, bitmap, sizeof(struct bmp_file_header_t));
     memcpy(&image_header, bitmap + sizeof(struct bmp_file_header_t), sizeof(struct bmp_image_header_t));
   }
@@ -158,6 +166,12 @@ private:
   }
 
   bmp_pixel_bw_t rgba_to_grayscale(struct bmp_pixel_rgba_t pixel) {
+    if (image_header.bpp < 24) {
+      // For non-rgb(a) bitmaps, we store the luminance value in the alpha
+      // channel. In that case we just return that value as is.
+      return pixel.alpha;
+    }
+
     // https://en.wikipedia.org/wiki/Grayscale#Luma_coding_in_video_systems
     uint8_t r = pixel.r;
     uint8_t g = pixel.g;
@@ -223,17 +237,23 @@ private:
     struct bmp_pixel_rgba_t pixel;
 
     // BMP uses little endian, thus bytes are stored as (A)RGB rather than RGB(A)
-    if (image_header.bpp < 32) {
+    if (image_header.bpp == 8) {
+      // For grayscale images (or non-rgb(a) images, more generally) we store the
+      // luminance/intensity value in the alpha channel.
+      pixel.alpha = *(offset);
+    } else if (image_header.bpp == 24) {
       pixel.alpha = 0;
       pixel.g = *(offset + 0);
       pixel.b = *(offset + 1);
       pixel.r = *(offset + 2);
-    } else {
+    } else if (image_header.bpp == 32) {
       // 32bit bitmaps include the alpha channel
       pixel.alpha = *(offset + 0);
       pixel.g = *(offset + 1);
       pixel.b = *(offset + 2);
       pixel.r = *(offset + 3);
+    } else {
+      PANIC(F("Unsupported bitmap depth format"));
     }
 
     return pixel;
