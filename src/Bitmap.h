@@ -37,8 +37,9 @@ struct __attribute__((__packed__)) bmp_image_header_t {
 
 class Bitmap {
 public:
-  Bitmap(const unsigned char *bitmap) {
+  Bitmap(const unsigned char *bitmap, bool invert = false) {
     this->bitmap = bitmap;
+    this->invert = invert;
     parse_headers();
   }
 
@@ -58,7 +59,15 @@ public:
       binarisation_threshold = 255 / 2;
     }
 
-    return (rgba_to_grayscale(raw_pixel(x, y)) > binarisation_threshold ? 1 : 0);
+    if (rgba_to_grayscale(raw_pixel(x, y)) >= binarisation_threshold) {
+      // Foreground
+      if (invert) return 255;
+      return 0;
+    } else {
+      // Background
+      if (invert) return 0;
+      return 255;
+    }
   }
 
   const inline uint32_t width() {
@@ -73,6 +82,7 @@ public:
 
 private:
   const unsigned char *bitmap;
+  bool invert;
 
   bmp_file_header_t file_header;
   bmp_image_header_t image_header;
@@ -147,9 +157,21 @@ private:
 
   bmp_pixel_bw_t rgba_to_grayscale(struct bmp_pixel_rgba_t pixel) {
     // https://en.wikipedia.org/wiki/Grayscale#Luma_coding_in_video_systems
-    const int16_t luminance = 0.2627 * pixel.r +
-                              0.6780 * pixel.g +
-                              0.0593 * pixel.b;
+    uint8_t r = pixel.r;
+    uint8_t g = pixel.g;
+    uint8_t b = pixel.b;
+
+    if (pixel.alpha > 128) {
+      // If the pixel is transparent enough, consider it invisible and therefore
+      // white for all intents and purposes.
+      r = 255;
+      g = 255;
+      b = 255;
+    }
+
+    const int16_t luminance = 0.2627 * r +
+                              0.6780 * g +
+                              0.0593 * b;
 
     if (luminance > 255) {
       // Account for floating point rounding errors
