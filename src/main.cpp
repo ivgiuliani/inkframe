@@ -11,10 +11,12 @@ void setup() {
 
   while(!Serial) { }
 
-  Serial.println(F("inkframe started."));
+  delay(1000);
+  Serial.println(F("booting..."));
 
   pinMode(LED_BUILTIN, OUTPUT);
   display.begin();
+  Serial.println(F("inkframe started."));
 }
 
 int idx = 1;
