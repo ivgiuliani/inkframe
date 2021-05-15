@@ -54,9 +54,9 @@ public:
     if (image_header.bpp >= 24 && binarisation_threshold < 0) {
       // As this is an expensive operation, only do it when we read the first
       // pixel and then cache the value.
-      binarisation_threshold = calculate_binarisation_threshold();
-    } else {
-      binarisation_threshold = 255 / 2;
+      this->binarisation_threshold = calculate_binarisation_threshold();
+    } else if (binarisation_threshold < 0) {
+      this->binarisation_threshold = 255 / 2;
     }
 
     if (rgba_to_grayscale(raw_pixel(x, y)) >= binarisation_threshold) {
@@ -87,7 +87,7 @@ private:
   bmp_file_header_t file_header;
   bmp_image_header_t image_header;
 
-  int8_t binarisation_threshold = -1;
+  int16_t binarisation_threshold = -1;
 
   #ifndef __bmp_pixel_size
   #  define __bmp_pixel_size() ((image_header.bpp / 8))
