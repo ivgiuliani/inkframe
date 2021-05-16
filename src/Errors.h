@@ -26,7 +26,7 @@
 }
 
 #if defined(ENABLE_SERIAL_DEBUG)
-#  define SERIAL_DEBUG(msg) { Serial.print(F("DEBUG: ")); Serial.println(msg); }
+#  define SERIAL_DEBUG(msg) { Serial.print(F("[DEBUG] ")); Serial.println(msg); }
 #else
 #  define SERIAL_DEBUG(msg)
 #endif
