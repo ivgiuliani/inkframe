@@ -6,8 +6,7 @@
 #include <WiFiClient.h>
 #include <esp_wifi.h>
 
-#define Q(x) #x
-#define QUOTE(x) Q(x)
+#include "micro_utils.h"
 
 #define WIFI_HOSTNAME QUOTE(_WIFI_HOSTNAME)
 #ifndef _WIFI_SSID
