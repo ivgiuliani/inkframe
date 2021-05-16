@@ -1,9 +1,11 @@
 #include <Arduino.h>
 
-#include "pins.h"
 #include "Display.h"
+#include "Connectivity.h"
+#include "Bitmap.h"
 
 Display display;
+Connectivity connectivity;
 
 void setup() {
   Serial.begin(115200);
@@ -16,23 +18,11 @@ void setup() {
 
   pinMode(LED_BUILTIN, OUTPUT);
   display.begin();
+  connectivity.attempt_wifi_connection();
+
   Serial.println(F("inkframe started."));
 }
 
-int idx = 1;
 void loop() {
-  digitalWrite(LED_BUILTIN, HIGH);
-  Serial.println("in loop");
-
-  DisplayT *d = display.get_display();
-
-  d->clearScreen();
-
-  d->fillScreen(GxEPD_WHITE);
-  d->print("Hello World!");
-  d->printf("%d", idx++);
-  d->nextPage();
-  digitalWrite(LED_BUILTIN, LOW);
-
-  delay(180000);
+  connectivity.update_state();
 }
