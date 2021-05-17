@@ -95,3 +95,30 @@ std::array<weather_t,3> get_daily_weather_forecast(HTTPClient *client) {
   }
   return forecasts;
 }
+
+const char *weather_to_description(Weather weather) {
+  switch(weather) {
+    case CLEAR_SKY:
+      return "clear sky";
+    case FEW_CLOUDS:
+      return "few clouds";
+    case SCATTERED_CLOUDS:
+      return "scattered clouds";
+    case BROKEN_CLOUDS:
+      return "broken clouds";
+    case OVERCAST_CLOUDS:
+      return "overcast";
+    case DRIZZLE:
+      return "drizzle";
+    case RAIN:
+      return "rain";
+    case THUNDERSTORM:
+      return "thunderstorm";
+    case SNOW:
+      return "snow";
+    case MIST:
+      return "mist";
+    case INVALID:
+      return "invalid";
+  }
+}

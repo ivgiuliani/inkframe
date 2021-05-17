@@ -51,4 +51,6 @@ weather_t get_current_weather_forecast(HTTPClient *client);
 // Returns the forecasts for the next 3 days
 std::array<weather_t,3> get_daily_weather_forecast(HTTPClient *client);
 
+const char *weather_to_description(Weather weather);
+
 #endif // __WEATHER_H
