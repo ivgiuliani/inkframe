@@ -117,6 +117,7 @@ const char *weather_to_description(Weather weather) {
     case MIST:
       return "mist";
     case INVALID:
+    default:
       return "invalid";
   }
 }
