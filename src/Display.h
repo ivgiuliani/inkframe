@@ -41,9 +41,9 @@ public:
   }
 
   // Sets some decent defaults for an empty new frame
-  inline void new_frame() {
+  inline void new_frame(uint8_t orientation = DISPLAY_ORIENT_LANDSCAPE) {
     this->display->setCursor(0, 0);
-    this->display->setRotation(DISPLAY_ORIENT_PORTRAIT);
+    this->display->setRotation(DISPLAY_ORIENT_LANDSCAPE);
     this->display->fillScreen(GxEPD_WHITE);
     this->display->setTextColor(GxEPD_BLACK);
     this->display->setFullWindow();
