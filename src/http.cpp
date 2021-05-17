@@ -1,11 +1,15 @@
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
 
+#include "Errors.h"
+
 bool json_from_http(HTTPClient *client,
                     const char *url,
                     JsonDocument *json) {
   client->useHTTP10(true);
   client->begin(url);
+
+  SERIAL_DEBUG((String("GET ") + url).c_str());
 
   const int http_code = client->GET();
   if (http_code < 0) {

@@ -13,8 +13,6 @@ bool owm_call_api(HTTPClient *client, const char *excludes, DynamicJsonDocument 
     "&lon=" + String(QUOTE(WEATHER_LON)) + \
     "&appid=" + String(QUOTE(OPENWEATHERMAP_API_KEY));
 
-  SERIAL_DEBUG(api_url);
-
   return json_from_http(client, api_url.c_str(), json);
 }
 
