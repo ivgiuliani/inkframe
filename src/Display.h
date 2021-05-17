@@ -2,10 +2,6 @@
 #define __DISPLAY_H
 
 #include <GxEPD2_BW.h>
-#include <GxEPD2_3C.h>
-
-#include <Fonts/FreeMono9pt7b.h>
-#include <Fonts/FreeMonoBold12pt7b.h>
 
 #include "Bitmap.h"
 #include "pins.h"
@@ -42,13 +38,14 @@ public:
 
   // Sets some decent defaults for an empty new frame
   inline void new_frame(uint8_t orientation = DISPLAY_ORIENT_LANDSCAPE) {
-    this->display->setCursor(0, 0);
-    this->display->setRotation(DISPLAY_ORIENT_LANDSCAPE);
-    this->display->fillScreen(GxEPD_WHITE);
-    this->display->setTextColor(GxEPD_BLACK);
-    this->display->setFullWindow();
-    this->display->setPartialWindow(
-      0, 0, this->display->width(), this->display->height()
+    display->setCursor(0, 0);
+    display->setRotation(orientation);
+    display->fillScreen(GxEPD_WHITE);
+    display->setTextColor(GxEPD_BLACK);
+    display->setFullWindow();
+    display->setFont(NULL);
+    display->setPartialWindow(
+      0, 0, display->width(), display->height()
     );
 
     // Text wrap is disabled by default because if something wraps it messes
