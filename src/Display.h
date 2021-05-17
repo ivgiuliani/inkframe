@@ -58,6 +58,15 @@ public:
     return this->display;
   }
 
+  void set_font(const GFXfont *font) {
+    display->setFont(font);
+  }
+
+  void draw_text(String text, uint16_t start_x, uint16_t start_y) {
+    display->setCursor(start_x, start_y);
+    display->print(text);
+  }
+
   // Renders the given bitmap at the chosen coordinates.
   // start_x, start_y: top left corner
   void draw_bitmap(Bitmap *bmp, int16_t start_x, uint16_t start_y) {
@@ -70,6 +79,10 @@ public:
         display->drawPixel(x, y, bmp->read_pixel(image_x, image_y) > 0 ? GxEPD_WHITE : GxEPD_BLACK);
       }
     }
+  }
+
+  void refresh() {
+    while(display->nextPage()) {};
   }
 
 private:
