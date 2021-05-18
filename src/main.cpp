@@ -16,7 +16,6 @@ void setup() {
 
   while(!Serial) { }
 
-  delay(1000);
   Serial.println(F("booting..."));
 
   pinMode(LED_BUILTIN, OUTPUT);
