@@ -1,7 +1,7 @@
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
 
-#include "Errors.h"
+#include "errors.h"
 
 bool json_from_http(HTTPClient *client,
                     const char *url,

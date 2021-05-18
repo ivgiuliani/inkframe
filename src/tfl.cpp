@@ -5,7 +5,7 @@
 
 #include "http.h"
 #include "tfl.h"
-#include "Errors.h"
+#include "errors.h"
 
 std::map<String, String> tfl_get_status(HTTPClient *client, String lines) {
   std::map<String, String> result;

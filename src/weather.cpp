@@ -3,7 +3,7 @@
 #include <HTTPClient.h>
 #include "http.h"
 #include "micro_utils.h"
-#include "Errors.h"
+#include "errors.h"
 
 bool owm_call_api(HTTPClient *client, const char *excludes, DynamicJsonDocument *json) {
   String api_url = String(__OPENWEATHERMAP_API_BASE_URL) + \

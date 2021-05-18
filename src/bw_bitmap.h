@@ -1,7 +1,7 @@
 #ifndef __BITMAP_H
 #define __BITMAP_H
 
-#include "Errors.h"
+#include "errors.h"
 
 #ifdef ESP32
 #  include <Arduino.h>

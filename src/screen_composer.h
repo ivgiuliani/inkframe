@@ -4,7 +4,7 @@
 #include <map>
 #include <Arduino.h>
 
-#include "Display.h"
+#include "display.h"
 #include "weather.h"
 #include "tfl.h"
 

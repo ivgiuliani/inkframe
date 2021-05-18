@@ -2,8 +2,8 @@
 #include <ArduinoJson.h>
 #include <HTTPClient.h>
 
-#include "Display.h"
-#include "Connectivity.h"
+#include "display.h"
+#include "connectivity.h"
 
 #include "screen_composer.h"
 

@@ -5,7 +5,7 @@
 #include "weather.h"
 #include "tfl.h"
 #include "screen_composer.h"
-#include "Display.h"
+#include "display.h"
 #include "micro_utils.h"
 
 #include "icons/weather.bmp.h"
