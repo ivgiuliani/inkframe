@@ -40,20 +40,23 @@ struct __attribute__((__packed__)) bmp_image_header_t {
   uint32_t important_colors;
 };
 
-// Simple bitmap handler class for bitmaps to be displayed on the e-ink screen.
-// Currently only 8, 24 and 32 bit bitmaps are supported.
-// For 24 and 32 bit bitmaps, an adaptive threshold binarisation process is
-// applied to automatically convert the image to black and white without too
-// much loss of quality.
-class Bitmap {
+/**
+ * Simple bitmap handler class for bitmaps to be displayed on the e-ink screen.
+ * 
+ * Currently only 8, 24 and 32 bit bitmaps are supported.
+ * For 24 and 32 bit bitmaps, an adaptive threshold binarisation process is
+ * applied to automatically convert the image to black and white without too
+ * much loss of quality.
+ */
+class BWBitmap {
 public:
-  Bitmap(const unsigned char *bitmap, bool invert = false) {
+  BWBitmap(const unsigned char *bitmap, bool invert = false) {
     this->bitmap = bitmap;
     this->invert = invert;
     parse_headers();
   }
 
-  ~Bitmap() {
+  ~BWBitmap() {
     this->bitmap = NULL;
   }
 

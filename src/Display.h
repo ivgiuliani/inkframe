@@ -3,7 +3,7 @@
 
 #include <GxEPD2_BW.h>
 
-#include "Bitmap.h"
+#include "bw_bitmap.h"
 #include "pins.h"
 
 #define DISPLAY_ORIENT_LANDSCAPE 0
@@ -69,7 +69,7 @@ public:
 
   // Renders the given bitmap at the chosen coordinates.
   // start_x, start_y: top left corner
-  void draw_bitmap(Bitmap *bmp, int16_t start_x, uint16_t start_y) {
+  void draw_bitmap(BWBitmap *bmp, int16_t start_x, uint16_t start_y) {
     for (uint32_t y = start_y, image_y = 0;
          y < display->height() && image_y < bmp->height();
          y++, image_y++) {

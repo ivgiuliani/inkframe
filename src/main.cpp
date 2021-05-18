@@ -4,7 +4,6 @@
 
 #include "Display.h"
 #include "Connectivity.h"
-#include "Bitmap.h"
 
 #include "screen_composer.h"
 
