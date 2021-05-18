@@ -33,7 +33,6 @@ public:
 
     // Set some defaults and clear things out for the initial boot.
     new_frame();
-    this->display->firstPage();
   }
 
   // Sets some decent defaults for an empty new frame
