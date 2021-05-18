@@ -23,19 +23,20 @@ struct screen_t update_screen_data() {
   screen.current_weather = get_current_weather_forecast(&client);
   screen.next_three_days_weather = get_daily_weather_forecast(&client);
 
-  std::array<String, 10> lines{
+  std::array<String, 11> lines{
     TUBE_LINE_DLR,
     TUBE_LINE_BAKERLOO,
     TUBE_LINE_CENTRAL,
     TUBE_LINE_CIRCLE,
     TUBE_LINE_DISTRICT,
+    TUBE_LINE_HAMMERSMITH,
     TUBE_LINE_METROPOLITAN,
     TUBE_LINE_NORTHERN,
     TUBE_LINE_PICCADILLY,
     TUBE_LINE_VICTORIA,
     TUBE_LINE_JUBILEE,
   };
-  screen.tube_status = tfl_get_status(&client, tfl_line_collection<10>(lines));
+  screen.tube_status = tfl_get_status(&client, tfl_line_collection<11>(lines));
 
   return screen;
 }
