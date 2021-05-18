@@ -1,27 +1,25 @@
+#include <Arduino.h>
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
+#include <map>
 
 #include "http.h"
 #include "tfl.h"
 #include "Errors.h"
 
-String tfl_api_status_path(String line) {
-  if (line.equals(TUBE_LINE_DLR)) {
-    // DLR is the only "mode" supported, the rest is all "lines"
-    return "line/mode/";
-  }
-  return "line/";
-}
-
-String tfl_get_status(HTTPClient *client, String line) {
+std::map<String, String> tfl_get_status(HTTPClient *client, String lines) {
+  std::map<String, String> result;
   String api_url = String(__TFL_API_BASE_URL) + \
-    tfl_api_status_path(line) +
-    String(line) + "/status";
+    "line/" + lines + "/status";
 
-  DynamicJsonDocument json(2048);
+  DynamicJsonDocument json(1024 * 10);
   bool success = json_from_http(client, api_url.c_str(), &json);
 
-  if (!success) return "";
+  if (!success) return result;
 
-  return json[0]["lineStatuses"][0]["statusSeverityDescription"].as<String>();
+  for (size_t i = 0; i < json.size(); i++) {
+    result[json[i]["name"].as<String>()] = json[i]["lineStatuses"][0]["statusSeverityDescription"].as<String>();
+  }
+
+  return result;
 }
