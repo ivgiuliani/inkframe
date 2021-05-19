@@ -30,7 +30,6 @@ void refresh() {
   digitalWrite(LED_BUILTIN, LOW);
 }
 
-bool executed = false;
 void loop() {
   if (connectivity.update_state() == CI_CONNECTING) {
     // Let the builtin LED blink for 0.5s while connecting to the wifi, this way
@@ -41,10 +40,8 @@ void loop() {
   }
 
   if (!connectivity.is_connected()) return;
-  if (executed) return;
 
   refresh();
-  executed = true;
 
   Serial.println("about to go to sleep...");
   esp_sleep_enable_timer_wakeup(1000000 * 60 * 10);
