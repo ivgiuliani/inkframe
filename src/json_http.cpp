@@ -16,13 +16,13 @@ bool json_from_http(HTTPClient *client,
   client->begin(url);
 
   SERIAL_DEBUG((String("GET ") + url).c_str());
-
   const int http_code = client->GET();
   if (http_code < 0 || http_code >= 400) {
     Serial.printf("GET failed, error: %d (%s)\n", http_code, client->errorToString(http_code).c_str());
     client->end();
     return false;
   }
+  SERIAL_DEBUG((String("-> GET ") + url + " OK " + http_code).c_str());
 
   deserializeJson(*json, client->getStream());
 
