@@ -61,8 +61,8 @@ public:
   }
 
   uint8_t read_pixel(uint32_t x, uint32_t y) {
-    if (x > width()) PANIC(F("Requested X coordinate exceeds image boundaries"));
-    if (y > height()) PANIC(F("Requested Y coordinate exceeds image boundaries"));
+    if (x > width()) PANIC("Requested X coordinate exceeds image boundaries");
+    if (y > height()) PANIC("Requested Y coordinate exceeds image boundaries");
 
     if (image_header.bpp >= 24 && binarisation_threshold < 0) {
       // As this is an expensive operation, only do it when we read the first
@@ -256,7 +256,7 @@ private:
       pixel.b = *(offset + 2);
       pixel.r = *(offset + 3);
     } else {
-      PANIC(F("Unsupported bitmap depth format"));
+      PANIC("Unsupported bitmap depth format");
     }
 
     return pixel;

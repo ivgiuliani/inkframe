@@ -18,14 +18,18 @@
 # define PANIC_RESTART()
 #endif
 
+#if defined(ESP32)
 #define PANIC(msg) { \
   Serial.println(F("!!! PANIC !!!")); \
   Serial.print(msg); \
   Serial.println(); \
   PANIC_RESTART(); \
 }
+#else
+#define PANIC(msg)
+#endif
 
-#if defined(ENABLE_SERIAL_DEBUG)
+#if defined(ENABLE_SERIAL_DEBUG) && defined(ESP32)
 #  define SERIAL_DEBUG(msg) { Serial.print(F("[DEBUG] ")); Serial.println(msg); }
 #else
 #  define SERIAL_DEBUG(msg)
