@@ -25,8 +25,10 @@ struct screen_t update_screen_data() {
   struct screen_t screen;
 
   HTTPClient client;
-  screen.current_weather = get_current_weather_forecast(&client);
-  screen.next_three_days_weather = get_daily_weather_forecast(&client);
+  std::array<weather_t, 4> forecasts = get_weather_forecast(&client);
+
+  screen.current_weather = forecasts[0];
+  screen.next_three_days_weather = { forecasts[1], forecasts[2], forecasts[3] };
 
   std::array<String, 11> lines{
     TUBE_LINE_DLR,

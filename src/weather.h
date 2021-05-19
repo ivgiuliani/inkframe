@@ -45,6 +45,8 @@ struct weather_t {
 
 #define __OPENWEATHERMAP_API_BASE_URL "https://api.openweathermap.org/data/2.5"
 
+std::array<weather_t, 4> get_weather_forecast(HTTPClient *client);
+
 // Returns the current weather
 weather_t get_current_weather_forecast(HTTPClient *client);
 

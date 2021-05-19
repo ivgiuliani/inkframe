@@ -48,49 +48,38 @@ Weather owm_from_weather_id(const int id) {
   return Weather::INVALID;
 }
 
-weather_t get_current_weather_forecast(HTTPClient *client) {
-  weather_t forecast;
-  DynamicJsonDocument json(4096);
+// Return an array of 4 items: the first element is the current weather state,
+// the other 3 are the *next* 3 days.
+std::array<weather_t, 4> get_weather_forecast(HTTPClient *client) {
+  std::array<weather_t, 4> forecasts;
+  DynamicJsonDocument json(1024 * 20);
+  weather_t tmp;
 
-  bool success = owm_call_api(client, "hourly,daily,minutely,alerts", &json);
+  bool success = owm_call_api(client, "hourly,minutely,alerts", &json);
   if (!success) {
-    forecast.forecast = ForecastType::UNAVAILABLE;
-    return forecast;
-  } else {
-    forecast.forecast = CURRENT;
-
-    forecast.unix_timestamp_utc = json["current"]["dt"].as<uint32_t>();
-    forecast.min_temp_c = json["current"]["temp"].as<float>();
-    forecast.max_temp_c = forecast.min_temp_c;
-    forecast.weather = owm_from_weather_id(json["current"]["weather"][0]["id"].as<uint16_t>());
-  }
-
-  return forecast;
-}
-
-std::array<weather_t,3> get_daily_weather_forecast(HTTPClient *client) {
-  std::array<weather_t,3> forecasts;
-  DynamicJsonDocument json(4096);
-
-  bool success = owm_call_api(client, "current,hourly,minutely,alerts", &json);
-  if (!success) {
-    weather_t tmp;
     tmp.forecast = ForecastType::UNAVAILABLE;
-    forecasts[0] = tmp;
-    forecasts[1] = tmp;
-    forecasts[2] = tmp;
+    forecasts[0] = tmp; forecasts[1] = tmp; forecasts[2] = tmp; forecasts[3] = tmp;
     return forecasts;
   } else {
-    // OWM will return a 0-indexed array of days, where 0 is today
-    for (uint8_t day = 1; day <= 3; day++) {
-      forecasts[day - 1].forecast = DAILY;
-      forecasts[day - 1].unix_timestamp_utc = json["daily"][day]["dt"].as<uint32_t>();
+    // Parse the "current" weather
+    forecasts[0].forecast = CURRENT;
+    forecasts[0].unix_timestamp_utc = json["current"]["dt"].as<uint32_t>();
+    forecasts[0].min_temp_c = json["current"]["temp"].as<float>();
+    forecasts[0].max_temp_c = forecasts[0].min_temp_c;
+    forecasts[0].weather = owm_from_weather_id(json["current"]["weather"][0]["id"].as<uint16_t>());
 
-      forecasts[day - 1].min_temp_c = std::round(json["daily"][day]["temp"]["min"].as<float_t>());
-      forecasts[day - 1].max_temp_c = std::round(json["daily"][day]["temp"]["max"].as<float_t>());
-      forecasts[day - 1].weather = owm_from_weather_id(json["daily"][day]["weather"][0]["id"].as<uint16_t>());
+    // OWM will return a 0-indexed array of days, where 0 is "today", but for
+    // "today" we look at the "current" object instead as it's more relevant
+    // since "today" refers to the average weather of the day.
+    for (uint8_t day = 1; day <= 3; day++) {
+      forecasts[day].forecast = DAILY;
+      forecasts[day].unix_timestamp_utc = json["daily"][day]["dt"].as<uint32_t>();
+      forecasts[day].min_temp_c = std::round(json["daily"][day]["temp"]["min"].as<float_t>());
+      forecasts[day].max_temp_c = std::round(json["daily"][day]["temp"]["max"].as<float_t>());
+      forecasts[day].weather = owm_from_weather_id(json["daily"][day]["weather"][0]["id"].as<uint16_t>());
     }
   }
+
   return forecasts;
 }
 
