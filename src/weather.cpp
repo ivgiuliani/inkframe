@@ -24,6 +24,8 @@ Weather owm_from_weather_id(const int id) {
     case 3:
       return DRIZZLE;
     case 5:
+      // OWM has an odd definition of light rain/drizzle...
+      if (id == 500) { return DRIZZLE; }
       return RAIN;
     case 6:
       return SNOW;
