@@ -18,8 +18,9 @@ bool json_from_http(HTTPClient *client,
   SERIAL_DEBUG((String("GET ") + url).c_str());
 
   const int http_code = client->GET();
-  if (http_code < 0) {
-    Serial.printf("GET failed, error: %s\n", client->errorToString(http_code).c_str());
+  if (http_code < 0 || http_code >= 400) {
+    Serial.printf("GET failed, error: %d (%s)\n", http_code, client->errorToString(http_code).c_str());
+    client->end();
     return false;
   }
 
