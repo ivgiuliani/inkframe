@@ -68,6 +68,8 @@ std::array<weather_t, 4> get_weather_forecast(HTTPClient *client) {
     forecasts[0].unix_timestamp_utc = json["current"]["dt"].as<uint32_t>();
     forecasts[0].min_temp_c = json["current"]["temp"].as<float>();
     forecasts[0].max_temp_c = forecasts[0].min_temp_c;
+    forecasts[0].wind_speed = std::round(json["current"]["wind_speed"].as<float_t>());
+    forecasts[0].humidity = json["current"]["humidity"].as<uint16_t>();
     forecasts[0].weather = owm_from_weather_id(json["current"]["weather"][0]["id"].as<uint16_t>());
 
     // OWM will return a 0-indexed array of days, where 0 is "today", but for
@@ -78,6 +80,8 @@ std::array<weather_t, 4> get_weather_forecast(HTTPClient *client) {
       forecasts[day].unix_timestamp_utc = json["daily"][day]["dt"].as<uint32_t>();
       forecasts[day].min_temp_c = std::round(json["daily"][day]["temp"]["min"].as<float_t>());
       forecasts[day].max_temp_c = std::round(json["daily"][day]["temp"]["max"].as<float_t>());
+      forecasts[day].wind_speed = std::round(json["daily"][day]["wind_speed"].as<float_t>());
+      forecasts[day].humidity = json["daily"][day]["humidity"].as<uint16_t>();
       forecasts[day].weather = owm_from_weather_id(json["daily"][day]["weather"][0]["id"].as<uint16_t>());
     }
   }

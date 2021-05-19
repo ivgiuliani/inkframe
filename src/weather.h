@@ -39,6 +39,11 @@ struct weather_t {
   int8_t min_temp_c;
   int8_t max_temp_c;
 
+  int8_t wind_speed;
+
+  // uint8_t should be enough, but who knows what will happen with climate change
+  int16_t humidity;
+
   // This will stop working in 2038...
   uint32_t unix_timestamp_utc;
 };
