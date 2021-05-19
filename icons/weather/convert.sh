@@ -16,5 +16,5 @@ for file in `ls *svg`; do
   convert "${base_file}_large.png" -colors 256 -compress none -depth 8 -type palette "${base_file}_large.bmp"
   convert "${base_file}_small.png" -colors 256 -compress none -depth 8 -type palette "${base_file}_small.bmp"
 
-#  rm -f "${base_file}_large.png" "${base_file}_small.png"
+  rm -f "${base_file}_large.png" "${base_file}_small.png"
 done
