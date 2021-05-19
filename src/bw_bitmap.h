@@ -50,9 +50,7 @@ struct __attribute__((__packed__)) bmp_image_header_t {
  */
 class BWBitmap {
 public:
-  BWBitmap(const unsigned char *bitmap, bool invert = false) {
-    this->bitmap = bitmap;
-    this->invert = invert;
+  BWBitmap(const unsigned char *bitmap) : bitmap(bitmap){
     parse_headers();
   }
 
@@ -74,11 +72,11 @@ public:
 
     if (rgba_to_grayscale(raw_pixel(x, y)) >= binarisation_threshold) {
       // Foreground
-      if (invert) return 255;
+      if (invert_pixel_value) return 255;
       return 0;
     } else {
       // Background
-      if (invert) return 0;
+      if (invert_pixel_value) return 0;
       return 255;
     }
   }
@@ -93,9 +91,18 @@ public:
              image_header.image_height;
   }
 
+  /**
+   * Invert the bitmap's blacks and whites
+   */
+  const BWBitmap invert() const {
+    BWBitmap copy = *this;
+    copy.invert_pixel_value = !invert_pixel_value;
+    return copy;
+  }
+
 private:
   const unsigned char *bitmap;
-  bool invert;
+  bool invert_pixel_value;
 
   bmp_file_header_t file_header;
   bmp_image_header_t image_header;

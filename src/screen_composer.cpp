@@ -67,52 +67,52 @@ void draw_tfl_data(Display *display, screen_t screen) {
 BWBitmap get_weather_icon_large(Weather weather) {
   switch (weather) {
     case DRIZZLE:
-      return BWBitmap(weather_bmp_drizzle_large, true);
+      return BWBitmap(weather_bmp_drizzle_large).invert();
     case RAIN:
-      return BWBitmap(weather_bmp_rain_large, true);
+      return BWBitmap(weather_bmp_rain_large).invert();
     case OVERCAST_CLOUDS:
-      return BWBitmap(weather_bmp_overcast_large, true);
+      return BWBitmap(weather_bmp_overcast_large).invert();
     case CLEAR_SKY:
-      return BWBitmap(weather_bmp_clear_sky_large, true);
+      return BWBitmap(weather_bmp_clear_sky_large).invert();
     case BROKEN_CLOUDS:
-      return BWBitmap(weather_bmp_overcast_large, true);
+      return BWBitmap(weather_bmp_overcast_large).invert();
     case SCATTERED_CLOUDS:
-      return BWBitmap(weather_bmp_scattered_clouds_large, true);
+      return BWBitmap(weather_bmp_scattered_clouds_large).invert();
     case THUNDERSTORM:
-      return BWBitmap(weather_bmp_thunderstorm_large, true);
+      return BWBitmap(weather_bmp_thunderstorm_large).invert();
     case FEW_CLOUDS:
-      return BWBitmap(weather_bmp_few_clouds_large, true);
+      return BWBitmap(weather_bmp_few_clouds_large).invert();
     case SNOW:
-      return BWBitmap(weather_bmp_snow_large, true);
+      return BWBitmap(weather_bmp_snow_large).invert();
     case INVALID:
     default:
-      return BWBitmap(weather_bmp_unknown_large, true);
+      return BWBitmap(weather_bmp_unknown_large).invert();
   }
 }
 
 BWBitmap get_weather_icon_small(Weather weather) {
   switch (weather) {
     case DRIZZLE:
-      return BWBitmap(weather_bmp_drizzle_small, true);
+      return BWBitmap(weather_bmp_drizzle_small).invert();
     case RAIN:
-      return BWBitmap(weather_bmp_rain_small, true);
+      return BWBitmap(weather_bmp_rain_small).invert();
     case OVERCAST_CLOUDS:
-      return BWBitmap(weather_bmp_overcast_small, true);
+      return BWBitmap(weather_bmp_overcast_small).invert();
     case CLEAR_SKY:
-      return BWBitmap(weather_bmp_clear_sky_small, true);
+      return BWBitmap(weather_bmp_clear_sky_small).invert();
     case BROKEN_CLOUDS:
-      return BWBitmap(weather_bmp_overcast_small, true);
+      return BWBitmap(weather_bmp_overcast_small).invert();
     case SCATTERED_CLOUDS:
-      return BWBitmap(weather_bmp_scattered_clouds_small, true);
+      return BWBitmap(weather_bmp_scattered_clouds_small).invert();
     case THUNDERSTORM:
-      return BWBitmap(weather_bmp_thunderstorm_small, true);
+      return BWBitmap(weather_bmp_thunderstorm_small).invert();
     case FEW_CLOUDS:
-      return BWBitmap(weather_bmp_few_clouds_small, true);
+      return BWBitmap(weather_bmp_few_clouds_small);
     case SNOW:
-      return BWBitmap(weather_bmp_snow_small, true);
+      return BWBitmap(weather_bmp_snow_small).invert();
     case INVALID:
     default:
-      return BWBitmap(weather_bmp_unknown_small, true);
+      return BWBitmap(weather_bmp_unknown_small).invert();
   }
 }
 
