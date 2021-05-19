@@ -14,7 +14,7 @@
 // the include of display.h
 #include "fonts/UbuntuMonoBold9pt8b.h"
 #include "fonts/UbuntuMonoRegular9pt8b.h"
-#include "fonts/UbuntuMonoBold24pt8b.h"
+#include "fonts/UbuntuMonoBold22pt8b.h"
 #include "fonts/UbuntuRegular9pt8b.h"
 #include "fonts/UbuntuMedium9pt8b.h"
 #include "fonts/UbuntuMedium11pt8b.h"
@@ -118,7 +118,7 @@ void draw_current_weather(Display *display, weather_t current) {
   BWBitmap bmp = get_weather_icon_large(current.weather);
   display->draw_bitmap(&bmp, 390, 10);
 
-  display->set_font(&UbuntuMonoBold24pt8b);
+  display->set_font(&UbuntuMonoBold22pt8b);
   display->draw_text(String(current.min_temp_c) + String("°"), 540, 60);
 
   display->set_font(&UbuntuMedium11pt8b);
@@ -142,7 +142,7 @@ void draw_date(Display *display, uint32_t now_utc_timestamp) {
   snprintf(buff, sizeof(buff), "%02d/%02d/%d",
     day(now_utc_timestamp), month(now_utc_timestamp), year(now_utc_timestamp));
 
-  display->set_font(&UbuntuMonoBold24pt8b);
+  display->set_font(&UbuntuMonoBold22pt8b);
   display->draw_text(buff, 40, 45);
 }
 
