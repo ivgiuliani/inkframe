@@ -61,7 +61,7 @@ public:
     }
   }
 
-  void update_state() {
+  ConnectionInternalState update_state() {
     const wl_status_t wifi_status = WiFi.status();
 
     switch (wifi_status) {
@@ -92,7 +92,7 @@ public:
           }
         }
         state = CI_CONNECTED;
-        return;
+        break;
       case WL_NO_SHIELD:
       case WL_IDLE_STATUS:
         if (connection_attempt_has_timed_out()) {
@@ -104,6 +104,8 @@ public:
         Serial.printf("Unknown wifi state: %d\n", wifi_status);
         break;
     }
+
+    return state;
   }
 
   inline bool is_connected() {
