@@ -1,7 +1,7 @@
 #include "weather.h"
 
 #include <HTTPClient.h>
-#include "http.h"
+#include "json_http.h"
 #include "micro_utils.h"
 #include "errors.h"
 

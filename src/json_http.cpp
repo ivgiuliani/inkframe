@@ -5,8 +5,14 @@
 
 bool json_from_http(HTTPClient *client,
                     const char *url,
-                    JsonDocument *json) {
+                    JsonDocument *json,
+                    int32_t connect_timeout,
+                    int32_t read_timeout) {
   client->useHTTP10(true);
+
+  client->setConnectTimeout(connect_timeout);
+  client->setTimeout(read_timeout);
+
   client->begin(url);
 
   SERIAL_DEBUG((String("GET ") + url).c_str());
