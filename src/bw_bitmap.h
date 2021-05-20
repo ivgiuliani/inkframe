@@ -85,12 +85,15 @@ public:
     if (x > width()) PANIC("Requested X coordinate exceeds image boundaries");
     if (y > height()) PANIC("Requested Y coordinate exceeds image boundaries");
 
-    if (image_header.bpp >= 24 && binarisation_threshold < 0) {
-      // As this is an expensive operation, only do it when we read the first
-      // pixel and then cache the value.
-      this->binarisation_threshold = calculate_binarisation_threshold();
-    } else if (binarisation_threshold < 0) {
-      this->binarisation_threshold = 255 / 2;
+    // As this can be an expensive operation, only do it when we read the first
+    // pixel and then cache the value.
+    switch(binarisation_mode) {
+      case ADAPTIVE:
+        binarisation_threshold = calculate_binarisation_threshold();
+        break;
+      case FIXED_HALF:
+        binarisation_threshold = 255 / 2;
+        break;
     }
 
     if (rgba_to_grayscale(raw_pixel(x, y)) >= binarisation_threshold) {
