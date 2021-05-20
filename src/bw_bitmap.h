@@ -40,6 +40,18 @@ struct __attribute__((__packed__)) bmp_image_header_t {
   uint32_t important_colors;
 };
 
+enum BWBinarisationMode {
+  // Pick the best binarisation mode depending on the image config.
+  AUTO = 0,
+
+  // Simplest B&W conversion: pixels closer to white will be converted to white,
+  // the others to black.
+  SIMPLE = 1,
+
+  // Uses single-pass adaptive thresholding to calculate the binarisation value.
+  ADAPTIVE = 2,
+};
+
 /**
  * Simple bitmap handler class for bitmaps to be displayed on the e-ink screen.
  * 
@@ -50,8 +62,19 @@ struct __attribute__((__packed__)) bmp_image_header_t {
  */
 class BWBitmap {
 public:
-  BWBitmap(const unsigned char *bitmap) : bitmap(bitmap){
+  BWBitmap(const unsigned char *bitmap, const BWBinarisationMode mode = AUTO) :
+    bitmap(bitmap)
+  {
+    binarisation_mode = mode;
     parse_headers();
+
+    if (mode == AUTO) {
+      if (image_header.bpp >= 24) {
+        binarisation_mode = ADAPTIVE;
+      } else {
+        binarisation_mode = SIMPLE;
+      }
+    }
   }
 
   ~BWBitmap() {
@@ -102,6 +125,7 @@ public:
 
 private:
   const unsigned char *bitmap;
+  BWBinarisationMode binarisation_mode;
   bool invert_pixel_value;
 
   bmp_file_header_t file_header;
@@ -175,7 +199,7 @@ private:
     return (foreground_luminance + background_luminance) / 2;
   }
 
-  bmp_pixel_bw_t rgba_to_grayscale(struct bmp_pixel_rgba_t pixel) {
+  bmp_pixel_bw_t rgba_to_grayscale(const struct bmp_pixel_rgba_t pixel) {
     if (image_header.bpp < 24) {
       // For non-rgb(a) bitmaps, we store the luminance value in the alpha
       // channel. In that case we just return that value as is.
@@ -216,7 +240,7 @@ private:
     return pixel;
   }
 
-  inline const unsigned char *scan_line_offset(uint16_t y_index) {
+  inline const unsigned char *scan_line_offset(const uint16_t y_index) {
     // Bitmaps start from the bottom left corner so the last row in the file is
     // actually the top row visually. I.e. usually the file follows this layout:
     //
