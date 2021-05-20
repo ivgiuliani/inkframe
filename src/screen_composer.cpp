@@ -64,60 +64,43 @@ void draw_tfl_data(Display *display, screen_t screen) {
   }
 }
 
-BWBitmap get_weather_icon_large(Weather weather) {
-  switch (weather) {
-    case DRIZZLE:
-      return BWBitmap(weather_bmp_drizzle_large).invert();
-    case RAIN:
-      return BWBitmap(weather_bmp_rain_large).invert();
-    case OVERCAST_CLOUDS:
-      return BWBitmap(weather_bmp_overcast_large).invert();
-    case CLEAR_SKY:
-      return BWBitmap(weather_bmp_clear_sky_large).invert();
-    case BROKEN_CLOUDS:
-      return BWBitmap(weather_bmp_overcast_large).invert();
-    case SCATTERED_CLOUDS:
-      return BWBitmap(weather_bmp_scattered_clouds_large).invert();
-    case THUNDERSTORM:
-      return BWBitmap(weather_bmp_thunderstorm_large).invert();
-    case FEW_CLOUDS:
-      return BWBitmap(weather_bmp_few_clouds_large).invert();
-    case SNOW:
-      return BWBitmap(weather_bmp_snow_large).invert();
-    case INVALID:
-    default:
-      return BWBitmap(weather_bmp_unknown_large).invert();
-  }
-}
+typedef struct {
+  Weather weather;
+  const unsigned char *small;
+  const unsigned char *large;
+} BitmapMapEntry;
 
-BWBitmap get_weather_icon_small(Weather weather) {
-  switch (weather) {
-    case DRIZZLE:
-      return BWBitmap(weather_bmp_drizzle_small).invert();
-    case RAIN:
-      return BWBitmap(weather_bmp_rain_small).invert();
-    case OVERCAST_CLOUDS:
-      return BWBitmap(weather_bmp_overcast_small).invert();
-    case CLEAR_SKY:
-      return BWBitmap(weather_bmp_clear_sky_small).invert();
-    case BROKEN_CLOUDS:
-      return BWBitmap(weather_bmp_overcast_small).invert();
-    case SCATTERED_CLOUDS:
-      return BWBitmap(weather_bmp_scattered_clouds_small).invert();
-    case THUNDERSTORM:
-      return BWBitmap(weather_bmp_thunderstorm_small).invert();
-    case FEW_CLOUDS:
-      return BWBitmap(weather_bmp_few_clouds_small);
-    case SNOW:
-      return BWBitmap(weather_bmp_snow_small).invert();
-    case INVALID:
-    default:
-      return BWBitmap(weather_bmp_unknown_small).invert();
+BWBitmap get_weather_icon(const Weather weather, const bool large) {
+  const unsigned char *entry = NULL;
+  const BitmapMapEntry entries[] = {
+    { DRIZZLE, weather_bmp_drizzle_small, weather_bmp_drizzle_large }, // 0x01
+    { RAIN, weather_bmp_rain_small, weather_bmp_rain_large }, // 0x02
+    { OVERCAST_CLOUDS, weather_bmp_overcast_small, weather_bmp_overcast_large }, // 0x03
+    { CLEAR_SKY, weather_bmp_clear_sky_small, weather_bmp_clear_sky_large }, // 0x04
+    { BROKEN_CLOUDS, weather_bmp_overcast_small, weather_bmp_overcast_large }, // 0x05
+    { SCATTERED_CLOUDS, weather_bmp_scattered_clouds_small, weather_bmp_scattered_clouds_large }, // 0x06
+    { THUNDERSTORM, weather_bmp_thunderstorm_small, weather_bmp_thunderstorm_large }, // 0x07
+    { FEW_CLOUDS, weather_bmp_few_clouds_small, weather_bmp_few_clouds_large }, // 0x08
+    { SNOW, weather_bmp_snow_small, weather_bmp_snow_large }, // 0x09
+    { INVALID, weather_bmp_unknown_small, weather_bmp_unknown_large }, // 0x0A
+  };
+
+  for (uint8_t i = 0; i < 0x0A; i++) {
+    if (entries[i].weather == weather) {
+      entry = large ? entries[i].large : entries[i].small;
+      break;
+    }
   }
+
+  if (entry == NULL) {
+    PANIC("Invalid weather request");
+  }
+
+  return BWBitmap(entry).invert();
 }
 
 void draw_current_weather(Display *display, weather_t current) {
-  BWBitmap bmp = get_weather_icon_large(current.weather);
+  BWBitmap bmp = get_weather_icon(current.weather, true);
   display->draw_bitmap(&bmp, 390, 10);
 
   display->set_font(&UbuntuMonoBold22pt8b);
@@ -129,7 +112,7 @@ void draw_current_weather(Display *display, weather_t current) {
 
 void draw_next_3_days_weather(Display *display, std::array<weather_t,3> weather) {
   for (uint8_t i = 0; i < 3; i++) {
-    BWBitmap bmp = get_weather_icon_small(weather[i].weather);
+    BWBitmap bmp = get_weather_icon(weather[i].weather, false);
 
     display->draw_bitmap(&bmp, 410 + (i * 110), 150);
 
