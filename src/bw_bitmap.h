@@ -81,7 +81,7 @@ public:
     this->bitmap = NULL;
   }
 
-  uint8_t read_pixel(uint32_t x, uint32_t y) {
+  bmp_pixel_bw_t read_pixel(const uint32_t x, const uint32_t y) {
     if (x > width()) PANIC("Requested X coordinate exceeds image boundaries");
     if (y > height()) PANIC("Requested Y coordinate exceeds image boundaries");
 
@@ -150,7 +150,7 @@ private:
     memcpy(&image_header, bitmap + sizeof(struct bmp_file_header_t), sizeof(struct bmp_image_header_t));
   }
 
-  uint8_t calculate_binarisation_threshold() {
+  uint8_t calculate_binarisation_threshold(const uint8_t adaptive_passes = 1) {
     // This method uses a single-pass adaptive thresholding to calculate the
     // binarisation threshold (pixels with luminance < this threshold will be
     // black): https://en.wikipedia.org/wiki/Thresholding_(image_processing)#Automatic_thresholding
@@ -172,31 +172,34 @@ private:
         pixel_start += __bmp_pixel_size();
       }
     }
-    const uint8_t average_luminance = running_luminance_sum / pixel_count;
+    uint8_t average_luminance = running_luminance_sum / pixel_count;
 
-    // Second pass: calculate two averages: one for background and one for
+    // Second+ pass: calculate two averages: one for background and one for
     // foreground pixels
-    for (uint16_t y = 0; y < height(); y++) {
-      scan_line = scan_line_offset(y);
-      unsigned char *pixel_start = const_cast<unsigned char *>(scan_line);
+    for (uint8_t i = 0; i < adaptive_passes; i++) {
+      for (uint16_t y = 0; y < height(); y++) {
+        scan_line = scan_line_offset(y);
+        unsigned char *pixel_start = const_cast<unsigned char *>(scan_line);
 
-      for(uint16_t x = 0; x < width(); x++) {
-        bmp_pixel_bw_t luminance = rgba_to_grayscale(unpack_rgba_pixel(pixel_start));
-        if (luminance < average_luminance) {
-          background_pixels++;
-          background_luminance_sum += luminance;
-        } else {
-          foreground_pixels++;
-          foreground_luminance_sum += luminance;
+        for(uint16_t x = 0; x < width(); x++) {
+          bmp_pixel_bw_t luminance = rgba_to_grayscale(unpack_rgba_pixel(pixel_start));
+          if (luminance < average_luminance) {
+            background_pixels++;
+            background_luminance_sum += luminance;
+          } else {
+            foreground_pixels++;
+            foreground_luminance_sum += luminance;
+          }
+          pixel_start += __bmp_pixel_size();
         }
-        pixel_start += __bmp_pixel_size();
       }
+      const uint16_t foreground_luminance = foreground_luminance_sum / foreground_pixels;
+      const uint16_t background_luminance = background_luminance_sum / background_pixels;
+
+      average_luminance = (foreground_luminance + background_luminance) / 2;
     }
 
-    const uint8_t foreground_luminance = foreground_luminance_sum / foreground_pixels;
-    const uint8_t background_luminance = background_luminance_sum / background_pixels;
-
-    return (foreground_luminance + background_luminance) / 2;
+    return average_luminance;
   }
 
   bmp_pixel_bw_t rgba_to_grayscale(const struct bmp_pixel_rgba_t pixel) {
