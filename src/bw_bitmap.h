@@ -108,17 +108,19 @@ public:
 
     // As this can be an expensive operation, only do it when we read the first
     // pixel and then cache the value.
-    switch(binarisation_mode) {
-      case ADAPTIVE:
-        binarisation_threshold = calculate_binarisation_threshold();
-        break;
-      case AUTO:
-        // We should never have to deal with 'AUTO' here, but in that case just
-        // make it a warning and do the simplest thing
-        WARN("Auto binarisation mode selected. This shouldn't happen.")
-      case SIMPLE:
-        binarisation_threshold = 255 / 2;
-        break;
+    if (binarisation_threshold < 0) {
+      switch(binarisation_mode) {
+        case ADAPTIVE:
+            binarisation_threshold = calculate_binarisation_threshold();
+          break;
+        case AUTO:
+          // We should never have to deal with 'AUTO' here, but in that case just
+          // make it a warning and do the simplest thing
+          WARN("Auto binarisation mode selected. This shouldn't happen.")
+        case SIMPLE:
+          binarisation_threshold = 255 / 2;
+          break;
+      }
     }
 
     if (rgba_to_grayscale(raw_pixel(x, y)) >= binarisation_threshold) {
