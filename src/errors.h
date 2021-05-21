@@ -29,6 +29,12 @@
 #define PANIC(msg)
 #endif
 
+#if defined(ESP32)
+#  define WARN(msg) { Serial.print(F("[WARN] ")); Serial.println(msg); }
+#else
+#  define WARN(msg)
+#endif
+
 #if defined(ENABLE_SERIAL_DEBUG) && defined(ESP32)
 #  define SERIAL_DEBUG(msg) { Serial.print(F("[DEBUG] ")); Serial.println(msg); }
 #else
