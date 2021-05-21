@@ -91,7 +91,7 @@ public:
       case ADAPTIVE:
         binarisation_threshold = calculate_binarisation_threshold();
         break;
-      case FIXED_HALF:
+      case SIMPLE:
         binarisation_threshold = 255 / 2;
         break;
     }
