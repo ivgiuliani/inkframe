@@ -40,6 +40,27 @@ struct __attribute__((__packed__)) bmp_image_header_t {
   uint32_t important_colors;
 };
 
+// For bmp_image_header_t.header_size == 108
+struct __attribute__((__packed__)) bmp_image_header_ext_v4_t {
+  uint32_t red_mask;
+  uint32_t green_mask;
+  uint32_t blue_mask;
+  uint32_t alpha_mask;
+  uint32_t color_space_type;
+  int32_t  red_x;
+  int32_t  red_y;
+  int32_t  red_z;
+  int32_t  green_x;
+  int32_t  green_y;
+  int32_t  green_z;
+  int32_t  blue_x;
+  int32_t  blue_y;
+  int32_t  blue_z;
+  uint32_t gamma_red;
+  uint32_t gamma_green;
+  uint32_t gamma_blue;
+};
+
 enum BWBinarisationMode {
   // Pick the best binarisation mode depending on the image config.
   AUTO = 0,
@@ -130,6 +151,14 @@ public:
     return copy;
   }
 
+  const bmp_image_header_t get_image_header() {
+    return image_header;
+  }
+
+  const bmp_image_header_ext_v4_t get_image_header_extended() {
+    return image_header_ext_v4;
+  }
+
 private:
   const unsigned char *bitmap;
   BWBinarisationMode binarisation_mode;
@@ -137,6 +166,7 @@ private:
 
   bmp_file_header_t file_header;
   bmp_image_header_t image_header;
+  bmp_image_header_ext_v4_t image_header_ext_v4;
 
   int16_t binarisation_threshold = -1;
 
@@ -155,6 +185,16 @@ private:
     // We ignore the color pallet block as we only support 8, 24 and 32 bits BMPs.
     memcpy(&file_header, bitmap, sizeof(struct bmp_file_header_t));
     memcpy(&image_header, bitmap + sizeof(struct bmp_file_header_t), sizeof(struct bmp_image_header_t));
+
+    if (image_header.header_size == 108 || image_header.header_size == 124) {
+      // This header is only read when the reported header size is 108 bytes
+      // There's also another extended variant with 124 bytes which includes
+      // ICC color profiles but as we don't support that we can skip the parsing
+      // of the extra bytes.
+      // https://en.wikipedia.org/wiki/BMP_file_format#DIB_header_(bitmap_information_header)
+      memcpy(&image_header_ext_v4, bitmap + sizeof(struct bmp_file_header_t) + image_header.header_size,
+      sizeof(struct bmp_image_header_ext_v4_t));
+    }
   }
 
   uint8_t calculate_binarisation_threshold(const uint8_t adaptive_passes = 1) {
