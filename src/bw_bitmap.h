@@ -111,7 +111,7 @@ public:
     if (binarisation_threshold < 0) {
       switch(binarisation_mode) {
         case ADAPTIVE:
-            binarisation_threshold = calculate_binarisation_threshold();
+          binarisation_threshold = calculate_binarisation_threshold();
           break;
         case AUTO:
           // We should never have to deal with 'AUTO' here, but in that case just
