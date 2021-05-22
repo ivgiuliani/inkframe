@@ -75,16 +75,16 @@ typedef struct {
 BWBitmap get_weather_icon(const Weather weather, const bool large) {
   const unsigned char *entry = NULL;
   const BitmapMapEntry entries[] = {
-    { DRIZZLE, weather_bmp_drizzle_small, weather_bmp_drizzle_large }, // 0x01
-    { RAIN, weather_bmp_rain_small, weather_bmp_rain_large }, // 0x02
-    { OVERCAST_CLOUDS, weather_bmp_overcast_small, weather_bmp_overcast_large }, // 0x03
-    { CLEAR_SKY, weather_bmp_clear_sky_small, weather_bmp_clear_sky_large }, // 0x04
-    { BROKEN_CLOUDS, weather_bmp_overcast_small, weather_bmp_overcast_large }, // 0x05
-    { SCATTERED_CLOUDS, weather_bmp_scattered_clouds_small, weather_bmp_scattered_clouds_large }, // 0x06
-    { THUNDERSTORM, weather_bmp_thunderstorm_small, weather_bmp_thunderstorm_large }, // 0x07
-    { FEW_CLOUDS, weather_bmp_few_clouds_small, weather_bmp_few_clouds_large }, // 0x08
-    { SNOW, weather_bmp_snow_small, weather_bmp_snow_large }, // 0x09
-    { INVALID, weather_bmp_unknown_small, weather_bmp_unknown_large }, // 0x0A
+    { DRIZZLE, weather_bmp_drizzle_64px, weather_bmp_drizzle_128px }, // 0x01
+    { RAIN, weather_bmp_rain_64px, weather_bmp_rain_128px }, // 0x02
+    { OVERCAST_CLOUDS, weather_bmp_overcast_64px, weather_bmp_overcast_128px }, // 0x03
+    { CLEAR_SKY, weather_bmp_clear_sky_64px, weather_bmp_clear_sky_128px }, // 0x04
+    { BROKEN_CLOUDS, weather_bmp_overcast_64px, weather_bmp_overcast_128px }, // 0x05
+    { SCATTERED_CLOUDS, weather_bmp_scattered_clouds_64px, weather_bmp_scattered_clouds_128px }, // 0x06
+    { THUNDERSTORM, weather_bmp_thunderstorm_64px, weather_bmp_thunderstorm_128px }, // 0x07
+    { FEW_CLOUDS, weather_bmp_few_clouds_64px, weather_bmp_few_clouds_128px }, // 0x08
+    { SNOW, weather_bmp_snow_64px, weather_bmp_snow_128px }, // 0x09
+    { INVALID, weather_bmp_unknown_64px, weather_bmp_unknown_128px }, // 0x0A
   };
 
   for (uint8_t i = 0; i < 0x0A; i++) {

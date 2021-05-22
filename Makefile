@@ -2,7 +2,9 @@ bitmap_test:
 	g++ misc/bitmap_test.cpp -I. -o bmp_test -g -Wall
 
 weather_icons:
-	cd icons/weather; ./convert.sh; cd ../..
+	rm -f icons/weather/*bmp
+	cd icons/; find weather/ -iname "*svg" -exec ./svg-to-bmp.sh 128 {} \;
+	cd icons/; find weather/ -iname "*svg" -exec ./svg-to-bmp.sh 64 {} \;
 	python generate_cpp_bitmap.py weather_bmp icons/weather/*bmp > src/icons/weather.bmp.h
 
 generic_icons:
