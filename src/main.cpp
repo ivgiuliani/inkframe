@@ -44,6 +44,11 @@ void loop() {
 
   if (!connectivity.is_connected()) return;
 
+  if (rtc.needs_update()) {
+    SERIAL_DEBUG("RTC needs to be updated");
+    rtc.adjust();
+  }
+
   refresh();
 
   Serial.println("about to go to sleep...");
