@@ -17,13 +17,26 @@
 #  define DisplayT GxEPD2_BW<__DisplayType, __DisplayType::HEIGHT>
 #endif
 
+class DisplayBox {
+public:
+  DisplayBox(uint16_t x, uint16_t y, uint16_t w, uint16_t h) :
+    x(x), y(y), w(w), h(h) {
+  }
+
+private:
+  uint16_t x;
+  uint16_t y;
+  uint16_t w;
+  uint16_t h;
+};
+
 class Display {
 public:
   void begin(const uint32_t serial_baud_rate = 115200, const uint16_t reset_duration = 2) {
     // Reconfigure SPI pins to point at SCK(13), MISO(12), MOSI(14) and SS(15)
     // as that's the configuration recommended from Waveshare for ESP32s.
     SPI.end();
-    SPI.begin(13, 12, 14, 15);
+    SPI.begin(SPI_SCK, SPI_MISO, SPI_MOSI, SPI_CS);
 
     this->display = new DisplayT(__DisplayType(SPI_CS, SPI_DC, SPI_RST, SPI_BUSY));
 
