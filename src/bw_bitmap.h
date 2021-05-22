@@ -126,13 +126,13 @@ public:
     }
 
     if (rgba_to_grayscale(raw_pixel(x, y)) >= binarisation_threshold) {
-      // Foreground
-      if (invert_pixel_value) return 255;
-      return 0;
-    } else {
-      // Background
+      // Whites
       if (invert_pixel_value) return 0;
       return 255;
+    } else {
+      // Blacks
+      if (invert_pixel_value) return 255;
+      return 0;
     }
   }
 

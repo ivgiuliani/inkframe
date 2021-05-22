@@ -96,7 +96,7 @@ BWBitmap get_weather_icon(const Weather weather, const bool large) {
     PANIC("Invalid weather request");
   }
 
-  return BWBitmap(entry).invert();
+  return BWBitmap(entry);
 }
 
 void draw_current_weather(Display *display, weather_t current) {
