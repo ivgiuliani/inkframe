@@ -75,7 +75,7 @@ void draw(BWBitmap *bmp) {
   for (uint32_t y = 0; y < bmp->height(); y++) {
     for (uint32_t x = 0; x < bmp->width(); x++) {
       const uint8_t p = bmp->read_pixel(x, y);
-      if (p > 0) {
+      if (p == 0) {
         printf("█");
       } else {
         printf(" ");

@@ -169,8 +169,8 @@ public:
 
 private:
   const unsigned char *bitmap;
-  BWBinarisationMode binarisation_mode;
-  bool invert_pixel_value;
+  BWBinarisationMode binarisation_mode = AUTO;
+  bool invert_pixel_value = false;
   std::vector<bmp_pixel_rgba_t> color_palette;
 
   bmp_file_header_t file_header;
@@ -280,7 +280,7 @@ private:
     uint8_t g = pixel.g;
     uint8_t b = pixel.b;
 
-    if (pixel.alpha > 128) {
+    if (pixel.alpha >= 128) {
       // If the pixel is transparent enough, consider it invisible and therefore
       // white for all intents and purposes.
       r = 255;
