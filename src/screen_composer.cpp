@@ -128,7 +128,7 @@ void draw_secondary_weather(Display *display, std::array<weather_t,3> weather) {
   BWBitmap wind = BWBitmap(generic_bmp_wind_24px);
 
   display->set_font(&UbuntuMedium9pt8b);
-  display->draw_bitmap(&weather_icon, 410, 140);
+  display->draw_bitmap(&weather_icon, 405, 140);
 
   display->draw_bitmap(&temperature, 490, 142);
   display->draw_text(String("Min: ") + String(tomorrow.min_temp_c) + "° / " +
