@@ -6,6 +6,7 @@
 #include "tfl.h"
 #include "screen_composer.h"
 #include "display.h"
+#include "rtc.h"
 #include "micro_utils.h"
 
 #include "icons/weather.bmp.h"
@@ -23,11 +24,14 @@
 #include "fonts/UbuntuBold9pt8b.h"
 #include "fonts/UbuntuBold12pt8b.h"
 
-struct screen_t update_screen_data() {
+struct screen_t update_screen_data(RTC *rtc) {
   struct screen_t screen;
 
   HTTPClient client;
   std::array<weather_t, 4> forecasts = get_weather_forecast(&client);
+
+  screen.current_time = rtc->now();
+  screen.home_temperature = std::lround(rtc->get_temperature());
 
   screen.current_weather = forecasts[0];
   screen.next_three_days_weather = { forecasts[1], forecasts[2], forecasts[3] };
@@ -101,22 +105,25 @@ BWBitmap get_weather_icon(const Weather weather, const bool large) {
   return BWBitmap(entry);
 }
 
-void draw_current_weather(Display *display, weather_t current) {
+void draw_current_weather(Display *display, screen_t screen, weather_t current) {
   BWBitmap bmp = get_weather_icon(current.weather, true);
-  display->draw_bitmap(&bmp, 390, 10);
+  display->draw_bitmap(&bmp, 390, 20);
 
+  BWBitmap home_temperature = BWBitmap(generic_bmp_house_thermometer_32px);
   BWBitmap temperature = BWBitmap(generic_bmp_thermometer_32px);
   BWBitmap humidity = BWBitmap(generic_bmp_humidity_32px);
   BWBitmap wind = BWBitmap(generic_bmp_wind_32px);
 
-  display->draw_bitmap(&temperature, 570, 15);
-  display->draw_bitmap(&humidity, 570, 51);
-  display->draw_bitmap(&wind, 570, 85);
+  display->draw_bitmap(&temperature, 560, 15);
+  display->draw_bitmap(&home_temperature, 560, 51);
+  display->draw_bitmap(&humidity, 560, 85);
+  display->draw_bitmap(&wind, 560, 119);
 
   display->set_font(&UbuntuMedium12pt8b);
-  display->draw_text(String(current.min_temp_c) + "°", 610, 36);
-  display->draw_text(String(current.humidity) + "%", 610, 72);
-  display->draw_text(String(current.wind_speed) + "m/s", 610, 106);
+  display->draw_text(String(current.min_temp_c) + "°", 600, 36);
+  display->draw_text(String(screen.home_temperature) + "°", 600, 72);
+  display->draw_text(String(current.humidity) + "%", 600, 108);
+  display->draw_text(String(current.wind_speed) + "m/s", 600, 144);
 }
 
 void draw_secondary_weather(Display *display, std::array<weather_t,3> weather) {
@@ -128,17 +135,17 @@ void draw_secondary_weather(Display *display, std::array<weather_t,3> weather) {
   BWBitmap wind = BWBitmap(generic_bmp_wind_24px);
 
   display->set_font(&UbuntuMedium9pt8b);
-  display->draw_bitmap(&weather_icon, 405, 140);
+  display->draw_bitmap(&weather_icon, 405, 170);
 
-  display->draw_bitmap(&temperature, 490, 142);
+  display->draw_bitmap(&temperature, 490, 172);
   display->draw_text(String("Min: ") + String(tomorrow.min_temp_c) + "° / " +
-                     String("Max: " ) + String(tomorrow.max_temp_c) + "°", 515, 159);
+                     String("Max: " ) + String(tomorrow.max_temp_c) + "°", 515, 189);
 
-  display->draw_bitmap(&humidity, 490, 175);
-  display->draw_text(String(tomorrow.humidity) + "%", 515, 190);
+  display->draw_bitmap(&humidity, 490, 205);
+  display->draw_text(String(tomorrow.humidity) + "%", 515, 220);
 
-  display->draw_bitmap(&wind, 570, 175);
-  display->draw_text(String(tomorrow.wind_speed) + "m/s", 599, 190);
+  display->draw_bitmap(&wind, 570, 205);
+  display->draw_text(String(tomorrow.wind_speed) + "m/s", 599, 220);
 }
 
 void draw_date(Display *display, uint32_t now_utc_timestamp) {
@@ -153,14 +160,10 @@ void draw_date(Display *display, uint32_t now_utc_timestamp) {
 void update_display(Display *display, screen_t screen) {
   display->new_frame();
 
-  // As a hack to avoid an extra http request (since there's no RTC on the
-  // board), we use the UTC timestamp as returned by the weather call to infer
-  // what day we're in. It will be wrong around midnight especially during DST
-  // but it's meant to be used in London so will not be too far off normally.
-  draw_date(display, screen.current_weather.unix_timestamp_utc);
+  draw_date(display, screen.current_time.unixtime());
 
   draw_tfl_data(display, screen);
-  draw_current_weather(display, screen.current_weather);
+  draw_current_weather(display, screen, screen.current_weather);
   draw_secondary_weather(display, screen.next_three_days_weather);
 
   display->refresh();

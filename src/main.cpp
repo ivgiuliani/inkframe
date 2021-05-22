@@ -28,7 +28,7 @@ void setup() {
 
 void refresh() {
   digitalWrite(LED_BUILTIN, HIGH);
-  screen_t screen_details = update_screen_data();
+  screen_t screen_details = update_screen_data(&rtc);
   update_display(&display, screen_details);
   digitalWrite(LED_BUILTIN, LOW);
 }
