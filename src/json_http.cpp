@@ -2,6 +2,7 @@
 #include <ArduinoJson.h>
 
 #include "errors.h"
+#include "micro_utils.h"
 
 bool json_from_http(HTTPClient *client,
                     const char *url,
@@ -24,7 +25,7 @@ bool json_from_http(HTTPClient *client,
       Serial.printf("GET failed (attempt %d), error: %d (%s)\n",
         attempt, http_code, client->errorToString(http_code).c_str());
       client->end();
-      vTaskDelay((attempt * retry_delay_backoff_ms) / portTICK_PERIOD_MS);
+      YIELD(attempt * retry_delay_backoff_ms);
       continue;
     }
     SERIAL_DEBUG((String("-> GET ") + url + " OK " + http_code).c_str());

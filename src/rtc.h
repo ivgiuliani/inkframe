@@ -6,6 +6,7 @@
 #include <cstdlib>
 
 #include "errors.h"
+#include "micro_utils.h"
 
 #define NTP_POOL_1 "pool.ntp.org"
 #define NTP_POOL_2 "time.google.com"
@@ -42,7 +43,7 @@ public:
     do {
       time(&now);
       localtime_r(&now, &time_info);
-      vTaskDelay(100 / portTICK_PERIOD_MS);
+      YIELD(100);
     } while (((millis() - start) <= timeout_ms) && (time_info.tm_year < (2021 - 1900)));
 
     rtc.adjust(DateTime(
