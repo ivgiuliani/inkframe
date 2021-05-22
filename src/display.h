@@ -19,7 +19,7 @@
 
 class Display {
 public:
-  void begin(uint32_t serial_baud_rate = 115200, uint reset_duration = 2) {
+  void begin(const uint32_t serial_baud_rate = 115200, const uint16_t reset_duration = 2) {
     // Reconfigure SPI pins to point at SCK(13), MISO(12), MOSI(14) and SS(15)
     // as that's the configuration recommended from Waveshare for ESP32s.
     SPI.end();
@@ -36,7 +36,7 @@ public:
   }
 
   // Sets some decent defaults for an empty new frame
-  inline void new_frame(uint8_t orientation = DISPLAY_ORIENT_LANDSCAPE) {
+  inline void new_frame(const uint8_t orientation = DISPLAY_ORIENT_LANDSCAPE) const {
     display->setCursor(0, 0);
     display->setRotation(orientation);
     display->fillScreen(GxEPD_WHITE);
@@ -53,22 +53,24 @@ public:
     this->display->setTextWrap(false);
   }
 
-  inline DisplayT *get_display() {
+  inline DisplayT *get_display() const {
     return this->display;
   }
 
-  void set_font(const GFXfont *font) {
+  void set_font(const GFXfont *font) const {
     display->setFont(font);
   }
 
-  void draw_text(String text, uint16_t start_x, uint16_t start_y) {
+  void draw_text(String text, const uint16_t start_x, const uint16_t start_y) const {
     display->setCursor(start_x, start_y);
     display->print(text);
   }
 
   // Renders the given bitmap at the chosen coordinates.
   // start_x, start_y: top left corner
-  void draw_bitmap(BWBitmap *bmp, int16_t start_x, uint16_t start_y) {
+  void draw_bitmap(BWBitmap *bmp,
+                   const int16_t start_x,
+                   const uint16_t start_y) const {
     for (uint32_t y = start_y, image_y = 0;
          y < display->height() && image_y < bmp->height();
          y++, image_y++) {
@@ -80,7 +82,7 @@ public:
     }
   }
 
-  void refresh() {
+  inline void refresh() const {
     while(display->nextPage()) {};
   }
 
