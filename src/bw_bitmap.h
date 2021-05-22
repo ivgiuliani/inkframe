@@ -1,6 +1,8 @@
 #ifndef __BITMAP_H
 #define __BITMAP_H
 
+#include <vector>
+
 #include "errors.h"
 
 #ifdef ESP32
@@ -161,10 +163,15 @@ public:
     return image_header_ext_v4;
   }
 
+  const std::vector<bmp_pixel_rgba_t> get_palette() {
+    return color_palette;
+  }
+
 private:
   const unsigned char *bitmap;
   BWBinarisationMode binarisation_mode;
   bool invert_pixel_value;
+  std::vector<bmp_pixel_rgba_t> color_palette;
 
   bmp_file_header_t file_header;
   bmp_image_header_t image_header;
@@ -189,13 +196,29 @@ private:
     memcpy(&image_header, bitmap + sizeof(struct bmp_file_header_t), sizeof(struct bmp_image_header_t));
 
     if (image_header.header_size == 108 || image_header.header_size == 124) {
-      // This header is only read when the reported header size is 108 bytes
+      // This header is only read when the reported header size is 108 bytes.
       // There's also another extended variant with 124 bytes which includes
       // ICC color profiles but as we don't support that we can skip the parsing
       // of the extra bytes.
       // https://en.wikipedia.org/wiki/BMP_file_format#DIB_header_(bitmap_information_header)
       memcpy(&image_header_ext_v4, bitmap + sizeof(struct bmp_file_header_t) + image_header.header_size,
-      sizeof(struct bmp_image_header_ext_v4_t));
+        sizeof(struct bmp_image_header_ext_v4_t));
+    }
+
+    // With compressed bitmaps there's a few extra mask bytes that we need to
+    // account for if the compression method is either BI_BIEFIELDS or BI_ALPHABITFIELDS.
+    uint32_t palette_offset = sizeof(struct bmp_file_header_t) + image_header.header_size;
+    if (image_header.compression_method == 3) { // BI_BITFIELDS
+      palette_offset += 12;
+    } else if (image_header.compression_method == 6) { // BI_ALPHABITFIELDS
+      palette_offset += 16;
+    }
+
+    for (uint32_t i = 0; i < image_header.colors_in_palette; i++) {
+      color_palette.push_back(unpack_rgba_pixel(bitmap + palette_offset, 32));
+
+      // Colors in a palette are always 32bpp.
+      palette_offset += 4;
     }
   }
 
@@ -252,12 +275,6 @@ private:
   }
 
   bmp_pixel_bw_t rgba_to_grayscale(const struct bmp_pixel_rgba_t pixel) {
-    if (image_header.bpp < 24) {
-      // For non-rgb(a) bitmaps, we store the luminance value in the alpha
-      // channel. In that case we just return that value as is.
-      return pixel.alpha;
-    }
-
     // https://en.wikipedia.org/wiki/Grayscale#Luma_coding_in_video_systems
     uint8_t r = pixel.r;
     uint8_t g = pixel.g;
@@ -288,6 +305,14 @@ private:
     const unsigned char *pixel_start = scan_line + x * __bmp_pixel_size();
 
     struct bmp_pixel_rgba_t pixel = unpack_rgba_pixel(pixel_start);
+    if (image_header.bpp <= 8) {
+      // Images with <= 8 bpp *must* be indexed. We don't support >8bpp indexed
+      // images yet and either way they normally only use the color palette for
+      // enumerating the supported colors rather than indexing purposes,
+      // but for <= 8bpp we store the pixel value in the alpha channel so all
+      // we need to do is translate the index to the value in the color palette.
+      pixel = color_palette[pixel.alpha];
+    }
 
     return pixel;
   }
@@ -319,25 +344,32 @@ private:
     return scan_line;
   }
 
-  const struct bmp_pixel_rgba_t unpack_rgba_pixel(const unsigned char *offset) {
+  const struct bmp_pixel_rgba_t unpack_rgba_pixel(const unsigned char *offset,
+                                                  int8_t bpp = -1) {
     struct bmp_pixel_rgba_t pixel;
+    if (bpp < 0) {
+      // Use the image_header.bpp value by default, but allow to override it.
+      // Useful for parsing indexed pixels in the color palette.
+      bpp = image_header.bpp;
+    }
 
     // BMP uses little endian, thus bytes are stored as (A)RGB rather than RGB(A)
-    if (image_header.bpp == 8) {
+    if (bpp == 8) {
       // For grayscale images (or non-rgb(a) images, more generally) we store the
       // luminance/intensity value in the alpha channel.
-      pixel.alpha = *(offset);
-    } else if (image_header.bpp == 24) {
+      pixel.alpha = *offset;
+      pixel.r = 0; pixel.g = 0; pixel.b = 0;
+    } else if (bpp == 24) {
       pixel.alpha = 0;
       pixel.g = *(offset + 0);
       pixel.b = *(offset + 1);
       pixel.r = *(offset + 2);
-    } else if (image_header.bpp == 32) {
+    } else if (bpp == 32) {
       // 32bit bitmaps include the alpha channel
-      pixel.alpha = *(offset + 0);
-      pixel.g = *(offset + 1);
-      pixel.b = *(offset + 2);
-      pixel.r = *(offset + 3);
+      pixel.g = *(offset + 0);
+      pixel.b = *(offset + 1);
+      pixel.r = *(offset + 2);
+      pixel.alpha = *(offset + 3);
     } else {
       PANIC("Unsupported bitmap depth format");
     }
