@@ -2,11 +2,13 @@
 
 #include "display.h"
 #include "connectivity.h"
+#include "rtc.h"
 
 #include "screen_composer.h"
 
 Display display;
 Connectivity connectivity;
+RTC rtc;
 
 void setup() {
   Serial.begin(115200);
@@ -17,6 +19,7 @@ void setup() {
   Serial.println(F("booting..."));
 
   pinMode(LED_BUILTIN, OUTPUT);
+  rtc.begin();
   display.begin();
   connectivity.attempt_wifi_connection();
 
