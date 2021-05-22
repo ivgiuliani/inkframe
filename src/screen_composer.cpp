@@ -9,6 +9,7 @@
 #include "micro_utils.h"
 
 #include "icons/weather.bmp.h"
+#include "icons/generic.bmp.h"
 
 // Due to a bug in the GFX library from Adafruit, these must be included *after*
 // the include of display.h
@@ -18,6 +19,7 @@
 #include "fonts/UbuntuRegular9pt8b.h"
 #include "fonts/UbuntuMedium9pt8b.h"
 #include "fonts/UbuntuMedium11pt8b.h"
+#include "fonts/UbuntuMedium12pt8b.h"
 #include "fonts/UbuntuBold9pt8b.h"
 #include "fonts/UbuntuBold12pt8b.h"
 
@@ -103,23 +105,40 @@ void draw_current_weather(Display *display, weather_t current) {
   BWBitmap bmp = get_weather_icon(current.weather, true);
   display->draw_bitmap(&bmp, 390, 10);
 
-  display->set_font(&UbuntuMonoBold22pt8b);
-  display->draw_text(String(current.min_temp_c) + String("°"), 540, 60);
+  BWBitmap temperature = BWBitmap(generic_bmp_thermometer_32px);
+  BWBitmap humidity = BWBitmap(generic_bmp_humidity_32px);
+  BWBitmap wind = BWBitmap(generic_bmp_wind_32px);
 
-  display->set_font(&UbuntuMedium11pt8b);
-  display->draw_text(weather_to_description(current.weather), 540, 100);
+  display->draw_bitmap(&temperature, 570, 15);
+  display->draw_bitmap(&humidity, 570, 51);
+  display->draw_bitmap(&wind, 570, 85);
+
+  display->set_font(&UbuntuMedium12pt8b);
+  display->draw_text(String(current.min_temp_c) + "°", 610, 36);
+  display->draw_text(String(current.humidity) + "%", 610, 72);
+  display->draw_text(String(current.wind_speed) + "m/s", 610, 106);
 }
 
-void draw_next_3_days_weather(Display *display, std::array<weather_t,3> weather) {
-  for (uint8_t i = 0; i < 3; i++) {
-    BWBitmap bmp = get_weather_icon(weather[i].weather, false);
+void draw_secondary_weather(Display *display, std::array<weather_t,3> weather) {
+  const weather_t tomorrow = weather[0];
 
-    display->draw_bitmap(&bmp, 410 + (i * 110), 150);
+  BWBitmap weather_icon = get_weather_icon(tomorrow.weather, false);
+  BWBitmap temperature = BWBitmap(generic_bmp_thermometer_24px);
+  BWBitmap humidity = BWBitmap(generic_bmp_humidity_24px);
+  BWBitmap wind = BWBitmap(generic_bmp_wind_24px);
 
-    display->set_font(&UbuntuMedium9pt8b);
-    const String temp_ind = String(weather[i].min_temp_c) + "/" + String(weather[i].max_temp_c) + String("°");
-    display->draw_text(temp_ind, 415 + (i * 110), 240);
-  }
+  display->set_font(&UbuntuMedium9pt8b);
+  display->draw_bitmap(&weather_icon, 410, 140);
+
+  display->draw_bitmap(&temperature, 490, 142);
+  display->draw_text(String("Min: ") + String(tomorrow.min_temp_c) + "° / " +
+                     String("Max: " ) + String(tomorrow.max_temp_c) + "°", 515, 159);
+
+  display->draw_bitmap(&humidity, 490, 175);
+  display->draw_text(String(tomorrow.humidity) + "%", 515, 190);
+
+  display->draw_bitmap(&wind, 570, 175);
+  display->draw_text(String(tomorrow.wind_speed) + "m/s", 599, 190);
 }
 
 void draw_date(Display *display, uint32_t now_utc_timestamp) {
@@ -142,7 +161,7 @@ void update_display(Display *display, screen_t screen) {
 
   draw_tfl_data(display, screen);
   draw_current_weather(display, screen.current_weather);
-  draw_next_3_days_weather(display, screen.next_three_days_weather);
+  draw_secondary_weather(display, screen.next_three_days_weather);
 
   display->refresh();
 }
