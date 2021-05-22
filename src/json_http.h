@@ -18,12 +18,16 @@
  *
  * @param client an instance of the http client that will be used to execute the
  *        http request
- * @param url    the url to execute the request agains
- * @param json   a json document where the response will be parsed into
+ * @param url     the url to execute the request agains
+ * @param json    a json document where the response will be parsed into
+ * @param retries how many attempts before we give up
+ * @param retry_delay_backoff_ms base threshold for exponential backoff for retries
  * @return true if the HTTP call returns successfully.
  */
 bool json_from_http(HTTPClient *client, const char *url, JsonDocument *json,
   int32_t connect_timeout = JSON_HTTP_CONNECT_TIMEOUT_MS,
-  int32_t read_timeout = JSON_HTTP_READ_TIMEOUT_MS);
+  int32_t read_timeout = JSON_HTTP_READ_TIMEOUT_MS,
+  uint8_t retries = 3,
+  uint32_t retry_delay_backoff_ms = 1000);
 
 #endif // __JSON_HTTP_H
