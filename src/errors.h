@@ -23,6 +23,7 @@
   Serial.println(F("!!! PANIC !!!")); \
   Serial.print(msg); \
   Serial.println(); \
+  Serial.flush(); \
   PANIC_RESTART(); \
 }
 #else
@@ -30,7 +31,7 @@
 #endif
 
 #if defined(ESP32)
-#  define WARN(msg) { Serial.print(F("[WARN] ")); Serial.println(msg); }
+#  define WARN(msg) { Serial.print(F("[WARN] ")); Serial.println(msg); Serial.flush(); }
 #else
 #  define WARN(msg)
 #endif
