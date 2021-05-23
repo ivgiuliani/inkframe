@@ -17,7 +17,7 @@
 // the include of display.h
 #include "fonts/UbuntuMonoBold9pt8b.h"
 #include "fonts/UbuntuMonoRegular9pt8b.h"
-#include "fonts/UbuntuMonoBold22pt8b.h"
+#include "fonts/UbuntuMonoBold20pt8b.h"
 #include "fonts/UbuntuRegular9pt8b.h"
 #include "fonts/UbuntuMedium9pt8b.h"
 #include "fonts/UbuntuMedium11pt8b.h"
@@ -37,7 +37,7 @@ struct screen_t update_screen_data(RTC *rtc) {
   screen.current_weather = forecasts[0];
   screen.next_three_days_weather = { forecasts[1], forecasts[2], forecasts[3] };
 
-  std::array<String, 11> lines{
+  std::array<String, 12> lines{
     TUBE_LINE_DLR,
     TUBE_LINE_BAKERLOO,
     TUBE_LINE_CENTRAL,
@@ -49,8 +49,9 @@ struct screen_t update_screen_data(RTC *rtc) {
     TUBE_LINE_PICCADILLY,
     TUBE_LINE_VICTORIA,
     TUBE_LINE_JUBILEE,
+    TUBE_LINE_WATERLOO,
   };
-  screen.tube_status = tfl_get_status(&client, tfl_line_collection<11>(lines));
+  screen.tube_status = tfl_get_status(&client, tfl_line_collection<12>(lines));
 
   screen.wikipedia_entry = wikipedia_get_onthisday(&client,
     rtc->now().month(), rtc->now().day()
@@ -61,16 +62,16 @@ struct screen_t update_screen_data(RTC *rtc) {
 
 void draw_tfl_data(Display *display, screen_t screen) {
   // Tfl data sits in the left half of the screen
-  uint16_t start_height = 85;
+  uint16_t start_height = 80;
 
   std::map<String, String>::iterator it = screen.tube_status.begin();
   while (it != screen.tube_status.end()) {
     display->set_font(&UbuntuBold9pt8b);
-    display->draw_text(it->first, 40, start_height);
+    display->draw_text(it->first, 42, start_height);
 
     display->set_font(&UbuntuMedium9pt8b);
-    display->draw_text(it->second, 225, start_height);
-    start_height += 32;
+    display->draw_text(it->second, 227, start_height);
+    start_height += 29;
     it++;
   }
 }
@@ -140,20 +141,20 @@ void draw_secondary_weather(Display *display, std::array<weather_t,3> weather) {
   BWBitmap wind = BWBitmap(generic_bmp_wind_24px);
 
   display->set_font(&UbuntuBold9pt8b);
-  display->draw_text("Tomorrow", 390, 180);
+  display->draw_text("Tomorrow", 390, 185);
 
   display->set_font(&UbuntuMedium9pt8b);
-  display->draw_bitmap(&weather_icon, 405, 190);
+  display->draw_bitmap(&weather_icon, 405, 195);
 
-  display->draw_bitmap(&temperature, 490, 192);
+  display->draw_bitmap(&temperature, 490, 197);
   display->draw_text(String("Min: ") + String(tomorrow.min_temp_c) + "° / " +
-                     String("Max: " ) + String(tomorrow.max_temp_c) + "°", 515, 209);
+                     String("Max: " ) + String(tomorrow.max_temp_c) + "°", 515, 214);
 
-  display->draw_bitmap(&humidity, 490, 225);
-  display->draw_text(String(tomorrow.humidity) + "%", 515, 240);
+  display->draw_bitmap(&humidity, 490, 230);
+  display->draw_text(String(tomorrow.humidity) + "%", 515, 245);
 
-  display->draw_bitmap(&wind, 570, 225);
-  display->draw_text(String(tomorrow.wind_speed) + "m/s", 599, 240);
+  display->draw_bitmap(&wind, 570, 230);
+  display->draw_text(String(tomorrow.wind_speed) + "m/s", 599, 245);
 }
 
 void draw_date(Display *display, uint32_t now_utc_timestamp) {
@@ -161,7 +162,7 @@ void draw_date(Display *display, uint32_t now_utc_timestamp) {
   snprintf(buff, sizeof(buff), "%02d/%02d/%d",
     day(now_utc_timestamp), month(now_utc_timestamp), year(now_utc_timestamp));
 
-  display->set_font(&UbuntuMonoBold22pt8b);
+  display->set_font(&UbuntuMonoBold20pt8b);
   display->draw_text(buff, 40, 45);
 }
 
