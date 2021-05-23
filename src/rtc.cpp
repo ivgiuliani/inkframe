@@ -27,12 +27,13 @@ bool RTC::needs_adjustment() {
  * A blocking call that queries NTP servers to update date and time.
  */
 bool RTC::adjust(const uint32_t timeout_ms) {
+  time_t now;
+  struct tm time_info;
+
+  sntp_set_sync_mode(SNTP_SYNC_MODE_IMMED);
   configTime(0, 0, NTP_POOL_1, NTP_POOL_2, NTP_POOL_3);
   setenv("TZ", TIMEZONE_DEF, 1);
   tzset();
-
-  time_t now;
-  struct tm time_info;
 
   // Best effort at blocking while the update is in progress.
   const uint64_t start = millis();
