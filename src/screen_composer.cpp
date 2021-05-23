@@ -148,7 +148,7 @@ void draw_secondary_weather(Display *display, std::array<weather_t,3> weather) {
 
   display->draw_bitmap(&temperature, 490, 197);
   display->draw_text(String("Min: ") + String(tomorrow.min_temp_c) + "° / " +
-                     String("Max: " ) + String(tomorrow.max_temp_c) + "°", 515, 219);
+                     String("Max: " ) + String(tomorrow.max_temp_c) + "°", 515, 214);
 
   display->draw_bitmap(&humidity, 490, 235);
   display->draw_text(String(tomorrow.humidity) + "%", 515, 250);
