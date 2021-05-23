@@ -9,9 +9,9 @@ bool owm_call_api(HTTPClient *client, const char *excludes, DynamicJsonDocument 
   String api_url = String(__OPENWEATHERMAP_API_BASE_URL) + \
     "/onecall?lang=en&units=metric" + \
     "&exclude=" + String(excludes) + \
-    "&lat=" + String(QUOTE(WEATHER_LAT)) + \
-    "&lon=" + String(QUOTE(WEATHER_LON)) + \
-    "&appid=" + String(QUOTE(OPENWEATHERMAP_API_KEY));
+    "&lat=" + String(WEATHER_LAT) + \
+    "&lon=" + String(WEATHER_LON) + \
+    "&appid=" + String(OPENWEATHERMAP_API_KEY);
 
   return json_from_http(client, api_url.c_str(), json);
 }

@@ -8,17 +8,14 @@
 
 #include "micro_utils.h"
 
-#define WIFI_HOSTNAME QUOTE(_WIFI_HOSTNAME)
-#if !defined(_WIFI_SSID)
-#  error "No WIFI SSID defined"
-#else
-#  define WIFI_SSID QUOTE(_WIFI_SSID)
+#if !defined(WIFI_HOSTNAME)
+#  error "No WIFI hostname defined"
 #endif
-
-#if !defined(_WIFI_PASS)
+#if !defined(WIFI_SSID)
+#  error "No WIFI SSID defined"
+#endif
+#if !defined(WIFI_PASS)
 #  error "No WIFI pass key defined"
-#else
-#  define WIFI_PASS QUOTE(_WIFI_PASS)
 #endif
 
 #if !defined(WIFI_CONNECTION_TIMEOUT_MS)
