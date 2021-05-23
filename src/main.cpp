@@ -44,7 +44,7 @@ void loop() {
 
   if (!connectivity.is_connected()) return;
 
-  if (rtc.needs_update()) {
+  if (rtc.needs_adjustment()) {
     SERIAL_DEBUG("RTC needs to be updated");
     rtc.adjust();
   }
