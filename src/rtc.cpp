@@ -7,6 +7,12 @@
 #include "errors.h"
 #include "micro_utils.h"
 
+#if !defined(STRICT_ANSI)
+// Avoid intellisense errors (see https://community.platformio.org/t/identifier-is-undefined-setenv-tzset/16162/2)
+  _VOID _EXFUN(tzset,	(_VOID));
+  int	_EXFUN(setenv,(const char *__string, const char *__value, int __overwrite));
+#endif
+
 // This will force an NTP update after every cold boot.
 RTC_DATA_ATTR uint64_t RTC_LAST_UPDATE = 0;
 
