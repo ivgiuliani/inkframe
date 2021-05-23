@@ -13,7 +13,11 @@ bool owm_call_api(HTTPClient *client, const char *excludes, DynamicJsonDocument 
     "&lon=" + String(WEATHER_LON) + \
     "&appid=" + String(OPENWEATHERMAP_API_KEY);
 
-  return json_from_http(client, api_url.c_str(), json);
+  StaticJsonDocument<64> filter;
+  filter["current"] = true;
+  filter["daily"] = true;
+
+  return json_from_http(client, api_url.c_str(), json, &filter);
 }
 
 Weather owm_from_weather_id(const int id) {
