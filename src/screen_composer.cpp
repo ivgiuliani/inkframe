@@ -7,6 +7,7 @@
 #include "screen_composer.h"
 #include "display.h"
 #include "rtc.h"
+#include "wikipedia.h"
 #include "micro_utils.h"
 
 #include "icons/weather.bmp.h"
@@ -50,6 +51,10 @@ struct screen_t update_screen_data(RTC *rtc) {
     TUBE_LINE_JUBILEE,
   };
   screen.tube_status = tfl_get_status(&client, tfl_line_collection<11>(lines));
+
+  screen.wikipedia_entry = wikipedia_get_onthisday(&client,
+    rtc->now().month(), rtc->now().day()
+  );
 
   return screen;
 }
@@ -134,18 +139,21 @@ void draw_secondary_weather(Display *display, std::array<weather_t,3> weather) {
   BWBitmap humidity = BWBitmap(generic_bmp_humidity_24px);
   BWBitmap wind = BWBitmap(generic_bmp_wind_24px);
 
+  display->set_font(&UbuntuBold9pt8b);
+  display->draw_text("Tomorrow", 390, 180);
+
   display->set_font(&UbuntuMedium9pt8b);
-  display->draw_bitmap(&weather_icon, 405, 170);
+  display->draw_bitmap(&weather_icon, 405, 190);
 
-  display->draw_bitmap(&temperature, 490, 172);
+  display->draw_bitmap(&temperature, 490, 192);
   display->draw_text(String("Min: ") + String(tomorrow.min_temp_c) + "° / " +
-                     String("Max: " ) + String(tomorrow.max_temp_c) + "°", 515, 189);
+                     String("Max: " ) + String(tomorrow.max_temp_c) + "°", 515, 209);
 
-  display->draw_bitmap(&humidity, 490, 205);
-  display->draw_text(String(tomorrow.humidity) + "%", 515, 220);
+  display->draw_bitmap(&humidity, 490, 225);
+  display->draw_text(String(tomorrow.humidity) + "%", 515, 240);
 
-  display->draw_bitmap(&wind, 570, 205);
-  display->draw_text(String(tomorrow.wind_speed) + "m/s", 599, 220);
+  display->draw_bitmap(&wind, 570, 225);
+  display->draw_text(String(tomorrow.wind_speed) + "m/s", 599, 240);
 }
 
 void draw_date(Display *display, uint32_t now_utc_timestamp) {
@@ -157,6 +165,15 @@ void draw_date(Display *display, uint32_t now_utc_timestamp) {
   display->draw_text(buff, 40, 45);
 }
 
+void draw_wikipedia(Display *display, struct wikipedia_onthisday_t on_this_day) {
+  String header = String("Happened on this day in ") + String(on_this_day.year);
+  display->set_font(&UbuntuBold9pt8b);
+  display->draw_text(header, 390, 300);
+
+  display->set_font(&UbuntuMedium9pt8b);
+  display->draw_text(on_this_day.text, 390, 325, 280);
+}
+
 void update_display(Display *display, screen_t screen) {
   display->new_frame();
 
@@ -165,6 +182,7 @@ void update_display(Display *display, screen_t screen) {
   draw_tfl_data(display, screen);
   draw_current_weather(display, screen, screen.current_weather);
   draw_secondary_weather(display, screen.next_three_days_weather);
+  draw_wikipedia(display, screen.wikipedia_entry);
 
   display->refresh();
 }

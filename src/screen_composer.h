@@ -8,6 +8,7 @@
 #include "weather.h"
 #include "rtc.h"
 #include "tfl.h"
+#include "wikipedia.h"
 
 struct screen_t {
   weather_t current_weather;
@@ -15,6 +16,7 @@ struct screen_t {
   int16_t home_temperature;
   std::array<weather_t,3> next_three_days_weather;
   std::map<String, String> tube_status;
+  struct wikipedia_onthisday_t wikipedia_entry;
 };
 
 struct screen_t update_screen_data(RTC *);
