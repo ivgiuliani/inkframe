@@ -2,7 +2,10 @@
 #define __DISPLAY_H
 
 #include <GxEPD2_BW.h>
+#include <string>
+#include <vector>
 
+#include "string_utils.h"
 #include "bw_bitmap.h"
 #include "pins.h"
 
@@ -16,19 +19,6 @@
 #  define __DisplayType GxEPD2_750_T7
 #  define DisplayT GxEPD2_BW<__DisplayType, __DisplayType::HEIGHT>
 #endif
-
-class DisplayBox {
-public:
-  DisplayBox(uint16_t x, uint16_t y, uint16_t w, uint16_t h) :
-    x(x), y(y), w(w), h(h) {
-  }
-
-private:
-  uint16_t x;
-  uint16_t y;
-  uint16_t w;
-  uint16_t h;
-};
 
 class Display {
 public:
@@ -74,9 +64,61 @@ public:
     display->setFont(font);
   }
 
-  void draw_text(String text, const uint16_t start_x, const uint16_t start_y) const {
-    display->setCursor(start_x, start_y);
-    display->print(text);
+  void draw_text(String text,
+                 const uint16_t start_x,
+                 const uint16_t start_y,
+                 const int16_t max_width = -1,
+                 const uint8_t v_padding = 3) {
+    if (max_width > 0) {
+      const int16_t max_x = min(display->width(), static_cast<int16_t>(max_width));
+      std::vector<String> words = split_words(text);
+      const auto space_width = text_width(" ");
+      uint16_t line_y = start_y;
+      String line;
+
+      // TODO: special case one long word case
+      uint16_t space_left = max_x;
+      for (uint16_t i = 0; i < words.size(); i++) {
+        const String word = words[i];
+        auto new_width = (text_width(word) + space_width);
+
+        if (new_width <= space_left) {
+          line += word + " ";
+          space_left -= new_width;
+        } else {
+          // Exhausted space in the current line, print whatever is in the buffer
+          // and move to the next line.
+          display->setCursor(start_x, line_y);
+          display->print(line);
+
+          line_y += text_height(line) + v_padding;
+          line = word + " ";
+          space_left = max_x - (text_width(word) + space_width);
+        }
+      }
+
+      if (!line.isEmpty()) {
+        display->setCursor(start_x, line_y);
+        display->print(line);
+      }
+    } else {
+      display->setCursor(start_x, start_y);
+      display->print(text);
+    }
+  }
+
+  inline uint16_t text_width(String s) const {
+    int16_t bound_x, bound_y;
+    uint16_t bound_w, bound_h;
+    display->getTextBounds(s, 0, 0, &bound_x, &bound_y, &bound_w, &bound_h);
+    return bound_w;
+  }
+
+  inline uint16_t text_height(String s) const {
+    int16_t bound_x, bound_y;
+    uint16_t bound_w, bound_h;
+    display->getTextBounds(s, 0, 0, &bound_x, &bound_y, &bound_w, &bound_h);
+    return bound_h;
   }
 
   // Renders the given bitmap at the chosen coordinates.
@@ -102,6 +144,5 @@ public:
 private:
   DisplayT *display;
 };
-
 
 #endif // __DISPLAY_H
