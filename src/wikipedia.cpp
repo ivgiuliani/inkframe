@@ -40,7 +40,7 @@ struct wikipedia_onthisday_t wikipedia_get_onthisday(HTTPClient *client,
     const uint16_t idx = random(all_events_count);
     result.year = json["events"][idx]["year"].as<uint16_t>();
     result.text = json["events"][idx]["text"].as<String>();
-  } while (attempt++ < 5 && !replace_invalid_chars(&result.text) && result.text.length() <= 130);
+  } while (attempt++ < 10 && !replace_invalid_chars(&result.text) && result.text.length() <= 130);
 
   return result;
 }
