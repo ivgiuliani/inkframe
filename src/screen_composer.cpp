@@ -144,17 +144,17 @@ void draw_secondary_weather(Display *display, std::array<weather_t,3> weather) {
   display->draw_text("Tomorrow", 390, 185);
 
   display->set_font(&UbuntuMedium9pt8b);
-  display->draw_bitmap(&weather_icon, 405, 195);
+  display->draw_bitmap(&weather_icon, 405, 200);
 
   display->draw_bitmap(&temperature, 490, 197);
   display->draw_text(String("Min: ") + String(tomorrow.min_temp_c) + "° / " +
-                     String("Max: " ) + String(tomorrow.max_temp_c) + "°", 515, 214);
+                     String("Max: " ) + String(tomorrow.max_temp_c) + "°", 515, 219);
 
-  display->draw_bitmap(&humidity, 490, 230);
-  display->draw_text(String(tomorrow.humidity) + "%", 515, 245);
+  display->draw_bitmap(&humidity, 490, 235);
+  display->draw_text(String(tomorrow.humidity) + "%", 515, 250);
 
-  display->draw_bitmap(&wind, 570, 230);
-  display->draw_text(String(tomorrow.wind_speed) + "m/s", 599, 245);
+  display->draw_bitmap(&wind, 570, 235);
+  display->draw_text(String(tomorrow.wind_speed) + "m/s", 599, 250);
 }
 
 void draw_date(Display *display, uint32_t now_utc_timestamp) {
