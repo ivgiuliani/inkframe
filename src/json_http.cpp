@@ -1,12 +1,14 @@
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
 
+#include "json_http.h"
 #include "errors.h"
 #include "micro_utils.h"
 
 bool json_from_http(HTTPClient *client,
                     const char *url,
                     JsonDocument *json,
+                    JsonDocument *filter,
                     int32_t connect_timeout,
                     int32_t read_timeout,
                     uint8_t retries,
@@ -30,7 +32,12 @@ bool json_from_http(HTTPClient *client,
     }
     SERIAL_DEBUG((String("-> GET ") + url + " OK " + http_code).c_str());
 
-    deserializeJson(*json, client->getStream());
+    if (filter == NULL) {
+      deserializeJson(*json, client->getStream());
+    } else {
+      deserializeJson(*json, client->getStream(),
+        DeserializationOption::Filter(*filter));
+    }
 
     client->end();
     return true;

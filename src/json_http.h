@@ -20,11 +20,14 @@
  *        http request
  * @param url     the url to execute the request agains
  * @param json    a json document where the response will be parsed into
+ * @param filter  a json document that describes the attribute to parse (NULL to parse the whole document)
  * @param retries how many attempts before we give up
  * @param retry_delay_backoff_ms base threshold for exponential backoff for retries
+ * @see https://arduinojson.org/v6/how-to/deserialize-a-very-large-document/
  * @return true if the HTTP call returns successfully.
  */
-bool json_from_http(HTTPClient *client, const char *url, JsonDocument *json,
+bool json_from_http(HTTPClient *client, const char *url,
+  JsonDocument *json, JsonDocument *filter = NULL,
   int32_t connect_timeout = JSON_HTTP_CONNECT_TIMEOUT_MS,
   int32_t read_timeout = JSON_HTTP_READ_TIMEOUT_MS,
   uint8_t retries = 3,

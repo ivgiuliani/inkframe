@@ -12,8 +12,12 @@ std::map<String, String> tfl_get_status(HTTPClient *client, String lines) {
   String api_url = String(__TFL_API_BASE_URL) + \
     "line/" + lines + "/status";
 
+  StaticJsonDocument<64> filter;
+  filter[0]["name"] = true;
+  filter[0]["lineStatuses"] = true;
+
   DynamicJsonDocument json(1024 * 10);
-  bool success = json_from_http(client, api_url.c_str(), &json);
+  bool success = json_from_http(client, api_url.c_str(), &json, &filter);
 
   if (!success) return result;
 
