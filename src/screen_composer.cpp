@@ -126,10 +126,10 @@ void draw_current_weather(Display *display, screen_t screen, weather_t current) 
   display->draw_bitmap(&wind, 560, 119);
 
   display->set_font(&UbuntuMedium12pt8b);
-  display->draw_text(String(screen.home_temperature) + "°", 600, 36);
-  display->draw_text(String(current.min_temp_c) + "°", 600, 72);
-  display->draw_text(String(current.humidity) + "%", 600, 108);
-  display->draw_text(String(current.wind_speed) + "m/s", 600, 144);
+  display->draw_text(String(screen.home_temperature) + "°", 605, 36);
+  display->draw_text(String(current.min_temp_c) + "°", 605, 72);
+  display->draw_text(String(current.humidity) + "%", 605, 108);
+  display->draw_text(String(current.wind_speed) + "m/s", 605, 144);
 }
 
 void draw_secondary_weather(Display *display, std::array<weather_t,3> weather) {
