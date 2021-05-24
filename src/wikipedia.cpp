@@ -4,8 +4,8 @@
 #include "string_utils.h"
 #include "json_http.h"
 
-boolean replace_invalid_chars(String *text) {
-  ascii_extended_remap(text);
+boolean replace_invalid_chars(std::string *text) {
+  *text = ascii_extended_remap(text);
   for (uint16_t i = 0; i < text->length(); i++) {
     if ((*text)[i] > 128) {
       return false;
@@ -40,8 +40,9 @@ struct wikipedia_onthisday_t wikipedia_get_onthisday(HTTPClient *client,
   do {
     const uint16_t idx = random(all_events_count);
     result.year = json["events"][idx]["year"].as<uint16_t>();
-    result.text = json["events"][idx]["text"].as<String>();
-  } while (++attempt < 20 && (!replace_invalid_chars(&result.text) || result.text.length() > 130));
+    result.text = json["events"][idx]["text"].as<std::string>();
+    result.text = ascii_extended_remap(&result.text);
+  } while (++attempt < 20 && result.text.length() > 130);
 
   return result;
 }

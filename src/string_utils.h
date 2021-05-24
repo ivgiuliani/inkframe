@@ -71,8 +71,8 @@ const char ASCII_EXTENDED_REMAP[] = {
   ' ', // 191 ¿
   'A', // 192 À
   'A', // 193 Á
-  'A', // 194 Â
-  'A', // 195 Ã
+  'A', // 194 Â -- Unicode first byte point
+  'A', // 195 Ã -- Unicode first byte point
   'A', // 196 Ä
   'A', // 197 Å
   'A', // 198 Æ
@@ -135,7 +135,150 @@ const char ASCII_EXTENDED_REMAP[] = {
   'y', // 255 ÿ
 };
 
-std::vector<String> split_words(String text, const char separator = ' ');
-void ascii_extended_remap(String *orig);
+// Starts at 0xC2 0x80, finishes at 0xC2 0xBF
+const char UTF_BASIC_C2_REMAP[] = {
+  ' ', // 0x80 €
+  ' ', // 0x81 <ctrl char>
+  ' ', // 0x82 <break>
+  ' ', // 0x83 <no break>
+  ' ', // 0x84 <ctrl char>
+  '.', // 0x85 …
+  ' ', // 0x86 †
+  ' ', // 0x87 ‡
+  '^', // 0x88 ˆ
+  '%', // 0x89 ‰
+  'S', // 0x8a Š
+  '<', // 0x8b ‹
+  ' ', // 0x8c Œ
+  ' ', // 0x8d 
+  'Z', // 0x8e Ž
+  ' ', // 0x8f 
+  ' ', // 0x90 <control string>
+  '\'', // 0x91 ‘
+  '\'', // 0x92 ’
+  '"', // 0x93 “
+  '"', // 0x94 ”
+  '-', // 0x95 •
+  '-', // 0x96 –
+  '-', // 0x97 —
+  '~', // 0x98 ˜
+  ' ', // 0x99 ™
+  's', // 0x9a š
+  '>', // 0x9b ›
+  ' ', // 0x9c œ
+  ' ', // 0x9d <operating system command>
+  'z', // 0x9e ž
+  'Y', // 0x9f Ÿ
+  ' ', // 0xa0 <no break space>
+  '!', // 0xa1 ¡
+  'c', // 0xa2 ¢
+  164, // 0xa3 £
+  ' ', // 0xa4 ¤
+  'Y', // 0xa5 ¥
+  '|', // 0xa6 ¦
+  ' ', // 0xa7 §
+  ' ', // 0xa8 ¨
+  ' ', // 0xa9 ©
+  ' ', // 0xaa ª
+  '<', // 0xab «
+  ' ', // 0xac ¬
+  '-', // 0xad <soft hyphen>
+  ' ', // 0xae ®
+  ' ', // 0xaf ¯
+  176, // 0xb0 °
+  ' ', // 0xb1 ±
+  ' ', // 0xb2 ²
+  ' ', // 0xb3 ³
+  '\'', // 0xb4 ´
+  'u', // 0xb5 µ
+  ' ', // 0xb6 ¶
+  '-', // 0xb7 ·
+  ' ', // 0xb8 ¸
+  ' ', // 0xb9 ¹
+  176, // 0xba º
+  '>', // 0xbb »
+  ' ', // 0xbc ¼
+  ' ', // 0xbd ½
+  ' ', // 0xbe ¾
+  '?', // 0xbf ¿
+};
+
+// Starts at 0xC3 0x80, finishes at 0xC3 0xbf
+const char UTF_BASIC_C3_REMAP[] = {
+  'A', // 0x80 À
+  'A', // 0x81 Á
+  'A', // 0x82 Â
+  'A', // 0x83 Ã
+  'A', // 0x84 Ä
+  'A', // 0x85 Å
+  'A', // 0x86 Æ
+  'C', // 0x87 Ç
+  'E', // 0x88 È
+  'E', // 0x89 É
+  'E', // 0x8a Ê
+  'E', // 0x8b Ë
+  'I', // 0x8c
+  'I', // 0x8d
+  'I', // 0x8e
+  'I', // 0x8f
+  'D', // 0x90
+  'N', // 0x91
+  'O', // 0x92
+  'O', // 0x93
+  'O', // 0x94
+  'O', // 0x95
+  'O', // 0x96
+  'x', // 0x97 ×
+  'O', // 0x98 Ø
+  'U', // 0x99 Ù
+  'U', // 0x9a Ú
+  'U', // 0x9b Û
+  'U', // 0x9c Ü
+  'Y', // 0x9d Ý
+  ' ', // 0x9e Þ
+  'B', // 0x9f ß
+  'a', // 0xa0 à
+  'a', // 0xa1 á
+  'a', // 0xa2 â
+  'a', // 0xa3 ã
+  'a', // 0xa4 ä
+  'a', // 0xa5 å
+  'a', // 0xa6 æ
+  'c', // 0xa7 ç
+  'e', // 0xa8 è
+  'e', // 0xa9 é
+  'e', // 0xaa ê
+  'e', // 0xab ë
+  'i', // 0xac ì
+  'i', // 0xad í
+  'i', // 0xae î
+  'i', // 0xaf ï
+  ' ', // 0xb0 ð
+  'n', // 0xb1 ñ
+  'o', // 0xb2 ò
+  'o', // 0xb3 ó
+  'o', // 0xb4 ô
+  'o', // 0xb5 õ
+  'o', // 0xb6 ö
+  ' ', // 0xb7 ÷
+  'o', // 0xb8 ø
+  'u', // 0xb9 ù
+  'u', // 0xba ú
+  'u', // 0xbb û
+  'u', // 0xbc ü
+  'y', // 0xbd ý
+  ' ', // 0xbe þ
+  'y', // 0xbf ÿ
+};
+
+std::vector<std::string> split_words(std::string text, const char separator = ' ');
+std::string ascii_extended_remap(std::string *orig);
+std::string ltrim(const std::string &s);
+std::string rtrim(const std::string &s);
+std::string trim(const std::string &s);
+
+inline std::string from_arduino_str(String *str) {
+  return std::string(str->c_str());
+}
 
 #endif // __STRING_UTILS_H

@@ -71,7 +71,7 @@ public:
                  const uint8_t v_padding = 3) {
     if (max_width > 0) {
       const int16_t max_x = min(display->width(), static_cast<int16_t>(max_width));
-      std::vector<String> words = split_words(text);
+      std::vector<std::string> words = split_words(from_arduino_str(&text));
       const auto space_width = text_width(" ");
       uint16_t line_y = start_y;
       String line;
@@ -79,7 +79,7 @@ public:
       // TODO: special case one long word case
       uint16_t space_left = max_x;
       for (uint16_t i = 0; i < words.size(); i++) {
-        const String word = words[i];
+        const String word = String(words[i].c_str());
         auto new_width = (text_width(word) + space_width);
 
         if (new_width <= space_left) {

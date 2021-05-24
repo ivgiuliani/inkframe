@@ -172,7 +172,7 @@ void draw_wikipedia(Display *display, struct wikipedia_onthisday_t on_this_day) 
   display->draw_text(header, 390, 300);
 
   display->set_font(&UbuntuMedium9pt8b);
-  display->draw_text(on_this_day.text, 390, 325, 280);
+  display->draw_text(on_this_day.text.c_str(), 390, 325, 280);
 }
 
 void update_display(Display *display, screen_t screen) {
