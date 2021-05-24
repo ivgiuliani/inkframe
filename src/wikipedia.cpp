@@ -28,7 +28,8 @@ struct wikipedia_onthisday_t wikipedia_get_onthisday(HTTPClient *client,
     String(month) + "/" + String(day);
 
   DynamicJsonDocument json(1024 * 10);
-  bool success = json_from_http(client, api_url.c_str(), &json, &filter);
+  JsonHttp http(client, api_url.c_str());
+  bool success = http.execute(&json, &filter);
 
   if (!success) return result;
 

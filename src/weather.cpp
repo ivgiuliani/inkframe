@@ -17,7 +17,8 @@ bool owm_call_api(HTTPClient *client, const char *excludes, DynamicJsonDocument 
   filter["current"] = true;
   filter["daily"] = true;
 
-  return json_from_http(client, api_url.c_str(), json, &filter);
+  JsonHttp http(client, api_url.c_str());
+  return http.execute(json, &filter);
 }
 
 Weather owm_from_weather_id(const int id) {
