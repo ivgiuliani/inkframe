@@ -167,7 +167,12 @@ void draw_date(Display *display, uint32_t now_utc_timestamp) {
 }
 
 void draw_wikipedia(Display *display, struct wikipedia_onthisday_t on_this_day) {
-  String header = String("Happened on this day in ") + String(on_this_day.year);
+  String header = String("Happened on this day in ");
+  if (on_this_day.year >= 0) {
+    header += String(on_this_day.year);
+  } else {
+    header += String(-on_this_day.year) + " B.C";
+  }
   display->set_font(&UbuntuBold9pt8b);
   display->draw_text(header, 390, 300);
 
