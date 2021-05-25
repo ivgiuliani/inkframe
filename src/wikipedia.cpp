@@ -29,7 +29,7 @@ struct wikipedia_onthisday_t wikipedia_get_onthisday(HTTPClient *client,
   // TODO: remove/increase char limit if mounted on a larger panel
   do {
     const uint16_t idx = random(all_events_count);
-    result.year = json["events"][idx]["year"].as<uint16_t>();
+    result.year = json["events"][idx]["year"].as<int16_t>();
     result.text = json["events"][idx]["text"].as<std::string>();
     result.text = ascii_extended_remap(&result.text);
   } while (++attempt < 20 && result.text.length() > 150);

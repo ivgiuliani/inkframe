@@ -7,7 +7,7 @@
 #define WIKIPEDIA_ON_THIS_DAY_BASE_URI "https://en.wikipedia.org/api/rest_v1/feed/onthisday/events/"
 
 struct wikipedia_onthisday_t {
-  uint16_t year;
+  int16_t year;
   std::string text;
 };
 
