@@ -40,12 +40,39 @@ std::vector<std::string> split_words(std::string text, const char separator) {
 }
 
 std::string ascii_extended_remap(std::string *orig) {
+  // TODO: refactor this to do proper 2- and 3-bytes table lookups in a more
+  // generic way
   std::string new_str;
+  std::string::iterator peek_it;
 
   for (auto it = orig->begin(); it != orig->end(); it++) {
     if (*it < 128) {
       new_str += *it;
       continue;
+    }
+
+    // Special case utf8 dashes as they're quite common but 3 bytes wide.
+    if (*it == 0xE2) {
+      uint16_t dash_mask = 0;
+      peek_it = it;
+      peek_it++;
+      for (uint8_t b = 0; b < 2 && peek_it != orig->end(); b++, peek_it++) {
+        dash_mask |= (*peek_it << (b * 8));
+      }
+
+      // bytes are in reverse order because we shift left from first to last
+      if (
+        (dash_mask == 0x9080) || // hyphen
+        (dash_mask == 0x9180) || // non-breaking hyphen
+        (dash_mask == 0x9280) || // figure-dash (whatever that is)
+        (dash_mask == 0x9380) || // en-dash
+        (dash_mask == 0x9480) || // em-dash
+        (dash_mask == 0x9580) // horizontal bar
+      ) {
+        new_str += "-";
+        it++; it++;
+        continue;
+      }
     }
 
     if (*it != 0xC2 && *it != 0xC3) {
@@ -55,7 +82,7 @@ std::string ascii_extended_remap(std::string *orig) {
     }
 
     // Possibly unicode, peek at the next item
-    std::string::iterator peek_it = it;
+    peek_it = it;
     peek_it++;
 
     const bool we_can_remap = peek_it != orig->end() &&

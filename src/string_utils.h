@@ -103,7 +103,7 @@ const char ASCII_EXTENDED_REMAP[] = {
   'B', // 223 ß
   'a', // 224 à
   'a', // 225 á
-  'a', // 226 â
+  'a', // 226 â -- Unicode point
   'a', // 227 ã
   'a', // 228 ä
   'a', // 229 å

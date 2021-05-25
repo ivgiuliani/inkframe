@@ -4,16 +4,6 @@
 #include "string_utils.h"
 #include "json_http.h"
 
-boolean replace_invalid_chars(std::string *text) {
-  *text = ascii_extended_remap(text);
-  for (uint16_t i = 0; i < text->length(); i++) {
-    if ((*text)[i] > 128) {
-      return false;
-    }
-  }
-  return true;
-}
-
 struct wikipedia_onthisday_t wikipedia_get_onthisday(HTTPClient *client,
                                                      const uint8_t month,
                                                      const uint8_t day) {
