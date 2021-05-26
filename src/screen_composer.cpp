@@ -71,35 +71,71 @@ void draw_tfl_data(Display *display, screen_t screen) {
 
     display->set_font(&UbuntuMedium9pt8b);
     display->draw_text(it->second, 227, start_height);
-    start_height += 29;
+    start_height += 34;
     it++;
   }
 }
 
 typedef struct {
   Weather weather;
-  const unsigned char *small;
-  const unsigned char *large;
+  const unsigned char *small_day;
+  const unsigned char *large_day;
+  const unsigned char *small_night;
+  const unsigned char *large_night;
 } BitmapMapEntry;
 
-BWBitmap get_weather_icon(const Weather weather, const bool large) {
+BWBitmap get_weather_icon(const Weather weather, const bool large, const bool night) {
   const unsigned char *entry = NULL;
   const BitmapMapEntry entries[] = {
-    { DRIZZLE, weather_bmp_drizzle_64px, weather_bmp_drizzle_128px }, // 0x01
-    { RAIN, weather_bmp_rain_64px, weather_bmp_rain_128px }, // 0x02
-    { OVERCAST_CLOUDS, weather_bmp_overcast_64px, weather_bmp_overcast_128px }, // 0x03
-    { CLEAR_SKY, weather_bmp_clear_sky_64px, weather_bmp_clear_sky_128px }, // 0x04
-    { BROKEN_CLOUDS, weather_bmp_overcast_64px, weather_bmp_overcast_128px }, // 0x05
-    { SCATTERED_CLOUDS, weather_bmp_scattered_clouds_64px, weather_bmp_scattered_clouds_128px }, // 0x06
-    { THUNDERSTORM, weather_bmp_thunderstorm_64px, weather_bmp_thunderstorm_128px }, // 0x07
-    { FEW_CLOUDS, weather_bmp_few_clouds_64px, weather_bmp_few_clouds_128px }, // 0x08
-    { SNOW, weather_bmp_snow_64px, weather_bmp_snow_128px }, // 0x09
-    { INVALID, weather_bmp_unknown_64px, weather_bmp_unknown_128px }, // 0x0A
+    { DRIZZLE,
+      weather_bmp_drizzle_64px, weather_bmp_drizzle_128px,
+      weather_bmp_drizzle_64px, weather_bmp_drizzle_128px
+    }, // 0x01
+    { RAIN,
+      weather_bmp_rain_64px, weather_bmp_rain_128px,
+      weather_bmp_rain_64px, weather_bmp_rain_128px
+    }, // 0x02
+    { OVERCAST_CLOUDS,
+      weather_bmp_overcast_64px, weather_bmp_overcast_128px,
+      weather_bmp_overcast_64px, weather_bmp_overcast_128px
+    }, // 0x03
+    { CLEAR_SKY,
+      weather_bmp_clear_sky_64px, weather_bmp_clear_sky_128px,
+      weather_bmp_night_clear_sky_64px, weather_bmp_night_clear_sky_128px
+    }, // 0x04
+    { BROKEN_CLOUDS,
+      weather_bmp_overcast_64px, weather_bmp_overcast_128px,
+      weather_bmp_overcast_64px, weather_bmp_overcast_128px
+    }, // 0x05
+    { SCATTERED_CLOUDS,
+      weather_bmp_scattered_clouds_64px, weather_bmp_scattered_clouds_128px,
+      weather_bmp_night_scattered_clouds_64px, weather_bmp_night_scattered_clouds_128px
+    }, // 0x06
+    { THUNDERSTORM,
+      weather_bmp_thunderstorm_64px, weather_bmp_thunderstorm_128px,
+      weather_bmp_thunderstorm_64px, weather_bmp_thunderstorm_128px
+    }, // 0x07
+    { FEW_CLOUDS,
+      weather_bmp_few_clouds_64px, weather_bmp_few_clouds_128px,
+      weather_bmp_night_few_clouds_64px, weather_bmp_night_few_clouds_128px
+    }, // 0x08
+    { SNOW,
+      weather_bmp_snow_64px, weather_bmp_snow_128px,
+      weather_bmp_snow_64px, weather_bmp_snow_128px
+    }, // 0x09
+    { INVALID,
+      weather_bmp_unknown_64px, weather_bmp_unknown_128px,
+      weather_bmp_unknown_64px, weather_bmp_unknown_128px
+    }, // 0x0A
   };
 
   for (uint8_t i = 0; i < 0x0A; i++) {
     if (entries[i].weather == weather) {
-      entry = large ? entries[i].large : entries[i].small;
+      if (night) {
+        entry = large ? entries[i].large_night : entries[i].small_night;
+      } else {
+        entry = large ? entries[i].large_day : entries[i].small_day;
+      }
       break;
     }
   }
@@ -112,7 +148,8 @@ BWBitmap get_weather_icon(const Weather weather, const bool large) {
 }
 
 void draw_current_weather(Display *display, screen_t screen, weather_t current) {
-  BWBitmap bmp = get_weather_icon(current.weather, true);
+  const bool night_variant = screen.current_time.hour() >= 19 || screen.current_time.hour() <= 4;
+  BWBitmap bmp = get_weather_icon(current.weather, true, night_variant);
   display->draw_bitmap(&bmp, 390, 20);
 
   BWBitmap home_temperature = BWBitmap(generic_bmp_house_thermometer_32px);
@@ -135,7 +172,7 @@ void draw_current_weather(Display *display, screen_t screen, weather_t current) 
 void draw_secondary_weather(Display *display, std::array<weather_t,3> weather) {
   const weather_t tomorrow = weather[0];
 
-  BWBitmap weather_icon = get_weather_icon(tomorrow.weather, false);
+  BWBitmap weather_icon = get_weather_icon(tomorrow.weather, false, false);
   BWBitmap temperature = BWBitmap(generic_bmp_thermometer_24px);
   BWBitmap humidity = BWBitmap(generic_bmp_humidity_24px);
   BWBitmap wind = BWBitmap(generic_bmp_wind_24px);

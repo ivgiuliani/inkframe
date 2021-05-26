@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   id="weather-icon-mostlycloudy"
+   x="0px"
+   y="0px"
+   viewBox="0 0 64 64"
+   style="enable-background:new 0 0 64 64;"
+   xml:space="preserve"
+   sodipodi:docname="night_scattered_clouds.svg"
+   inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)"><metadata
+   id="metadata11"><rdf:RDF><cc:Work
+       rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+         rdf:resource="http://purl.org/dc/dcmitype/StillImage" /></cc:Work></rdf:RDF></metadata><defs
+   id="defs9" /><sodipodi:namedview
+   pagecolor="#ffffff"
+   bordercolor="#666666"
+   borderopacity="1"
+   objecttolerance="10"
+   gridtolerance="10"
+   guidetolerance="10"
+   inkscape:pageopacity="0"
+   inkscape:pageshadow="2"
+   inkscape:window-width="1912"
+   inkscape:window-height="2089"
+   id="namedview7"
+   showgrid="false"
+   inkscape:zoom="15.640625"
+   inkscape:cx="32"
+   inkscape:cy="47.344655"
+   inkscape:window-x="3200"
+   inkscape:window-y="67"
+   inkscape:window-maximized="0"
+   inkscape:current-layer="weather-icon-mostlycloudy" />
+
+<g
+   id="g25"
+   transform="translate(0,-4.1278722)"><path
+     d="M 49.3,57.8 H 16.9 C 11.3,57.8 6.7,53.2 6.7,47.6 6.7,43.2 9.5,39.3 13.6,38 v -0.2 c 0,-5.1 4.2,-9.3 9.3,-9.3 1.2,0 2.4,0.2 3.5,0.8 2.4,-3.7 6.6,-5.9 11.1,-5.9 7.3,0 13.4,6 13.4,13.4 0,0.8 -0.1,1.5 -0.2,2.3 4.6,0.7 8.2,4.6 8.2,9.4 -0.2,5 -4.4,9.3 -9.6,9.3 z M 22.8,31.4 c -3.5,0 -6.3,2.8 -6.3,6.3 0,0.3 0,0.7 0.1,1.1 l 0.2,1.4 -1.4,0.2 c -3.4,0.7 -5.8,3.7 -5.8,7.1 0,4 3.3,7.3 7.3,7.3 h 32.4 c 3.6,0 6.6,-3 6.6,-6.6 0,-3.6 -3,-6.6 -6.6,-6.6 H 49 l -2.2,0.1 0.7,-2.1 C 47.8,38.6 48,37.5 48,36.4 48,30.6 43.3,26 37.6,26 c -3.8,0 -7.4,2.2 -9.2,5.6 L 27.6,33 26.3,32.2 C 25.2,31.6 24,31.4 22.8,31.4 Z"
+     id="path2" /><path
+     d="m 57.3,19.8 c -3.3,0 -6.4,-1.5 -8,-3.9 -1.3,-2 -1.6,-5.1 -0.6,-7.7 v 0 h -0.3 c -2.8,0 -5.5,1 -7.5,3 -2,2 -3.2,4.7 -3.2,7.5 0,0.4 0,0.8 0.1,1.2 v 0.4 h 0.4 c 0.5,0 1.1,0.1 1.6,0.2 l 0.6,0.1 -0.1,-0.6 c -0.1,-0.5 -0.1,-0.9 -0.1,-1.3 0,-3.4 2.2,-6.5 5.4,-7.7 -0.2,2.7 0.5,5.2 2.2,7.3 1.8,2.3 4.5,3.8 7.7,4.2 -1,1.9 -2.3,3.1 -3.9,3.8 L 51,26.5 51.4,27 c 0.3,0.4 0.6,0.8 0.9,1.2 l 0.2,0.3 0.3,-0.2 c 3.2,-1.5 5.4,-4.5 5.9,-8 l 0.1,-0.5 z"
+     id="path4" /></g>
+</svg>
