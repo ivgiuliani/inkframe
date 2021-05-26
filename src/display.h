@@ -68,7 +68,7 @@ public:
                  const uint16_t start_x,
                  const uint16_t start_y,
                  const int16_t max_width = -1,
-                 const uint8_t v_padding = 3) {
+                 const uint8_t v_padding = 4) {
     if (max_width > 0) {
       const int16_t max_x = min(display->width(), static_cast<int16_t>(max_width));
       std::vector<std::string> words = split_words(from_arduino_str(&text));
@@ -117,7 +117,13 @@ public:
   inline uint16_t text_height(String s) const {
     int16_t bound_x, bound_y;
     uint16_t bound_w, bound_h;
-    display->getTextBounds(s, 0, 0, &bound_x, &bound_y, &bound_w, &bound_h);
+    // Always consider the upper case variant for height as otherwise it will
+    // look weird in cases where some lines have an uppercase letter as the#
+    // height measured on only-lower case lines it will be smaller than the ones
+    // for lines with an upper case letter.
+    String uppercase = s;
+    uppercase.toUpperCase();
+    display->getTextBounds(uppercase, 0, 0, &bound_x, &bound_y, &bound_w, &bound_h);
     return bound_h;
   }
 
