@@ -68,7 +68,7 @@ public:
                  const uint16_t start_x,
                  const uint16_t start_y,
                  const int16_t max_width = -1,
-                 const uint8_t v_padding = 4) {
+                 const uint8_t v_padding = 3) {
     if (max_width > 0) {
       const int16_t max_x = min(display->width(), static_cast<int16_t>(max_width));
       std::vector<std::string> words = split_words(from_arduino_str(&text));
@@ -91,7 +91,7 @@ public:
           display->setCursor(start_x, line_y);
           display->print(line);
 
-          line_y += text_height(line) + v_padding;
+          line_y += line_height() + v_padding;
           line = word + " ";
           space_left = max_x - (text_width(word) + space_width);
         }
@@ -117,14 +117,18 @@ public:
   inline uint16_t text_height(String s) const {
     int16_t bound_x, bound_y;
     uint16_t bound_w, bound_h;
-    // Always consider the upper case variant for height as otherwise it will
-    // look weird in cases where some lines have an uppercase letter as the#
-    // height measured on only-lower case lines it will be smaller than the ones
-    // for lines with an upper case letter.
-    String uppercase = s;
-    uppercase.toUpperCase();
-    display->getTextBounds(uppercase, 0, 0, &bound_x, &bound_y, &bound_w, &bound_h);
+    display->getTextBounds(s, 0, 0, &bound_x, &bound_y, &bound_w, &bound_h);
     return bound_h;
+  }
+
+  /** Calculate the possible max height for the current font settings so that
+   * we return a consistent line height regardless of whether the line includes
+   * lower case, upper cases chars or numbers.
+   **/
+  inline uint16_t line_height() {
+    return text_height(
+      F("abcdefghijklmnopqrstuvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$")
+    );
   }
 
   // Renders the given bitmap at the chosen coordinates.
