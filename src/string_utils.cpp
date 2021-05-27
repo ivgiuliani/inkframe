@@ -39,7 +39,7 @@ std::vector<std::string> split_words(std::string text, const char separator) {
   return words;
 }
 
-std::string ascii_extended_remap(std::string *orig) {
+std::string ascii_remap(std::string *orig) {
   // TODO: refactor this to do proper 2- and 3-bytes table lookups in a more
   // generic way
   std::string new_str;

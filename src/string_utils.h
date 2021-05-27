@@ -272,7 +272,7 @@ const char UTF_BASIC_C3_REMAP[] = {
 };
 
 std::vector<std::string> split_words(std::string text, const char separator = ' ');
-std::string ascii_extended_remap(std::string *orig);
+std::string ascii_remap(std::string *orig);
 std::string ltrim(const std::string &s);
 std::string rtrim(const std::string &s);
 std::string trim(const std::string &s);
