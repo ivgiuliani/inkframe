@@ -4,6 +4,14 @@
 #include "string_utils.h"
 #include "json_http.h"
 
+std::string remove_newlines(std::string in) {
+  std::string out;
+  for (auto it = in.begin(); it != in.end(); it++) {
+    if (*it != '\n' && *it != '\r') out += *it;
+  }
+  return out;
+}
+
 struct wikipedia_onthisday_t wikipedia_get_onthisday(HTTPClient *client,
                                                      const uint8_t month,
                                                      const uint8_t day) {
@@ -31,7 +39,7 @@ struct wikipedia_onthisday_t wikipedia_get_onthisday(HTTPClient *client,
     const uint16_t idx = random(all_events_count);
     result.year = json["events"][idx]["year"].as<int16_t>();
     result.text = json["events"][idx]["text"].as<std::string>();
-    result.text = ascii_remap(&result.text);
+    result.text = remove_newlines(ascii_remap(&result.text));
   } while (++attempt < 20 && result.text.length() > 150);
 
   return result;
