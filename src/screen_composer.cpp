@@ -77,7 +77,7 @@ void draw_tfl_data(Display *display, screen_t screen) {
 }
 
 typedef struct {
-  Weather weather;
+  const Weather weather;
   const unsigned char *small_day;
   const unsigned char *large_day;
   const unsigned char *small_night;
