@@ -21,6 +21,7 @@
 #if defined(ESP32)
 #define PANIC(msg) { \
   Serial.println(F("!!! PANIC !!!")); \
+  Serial.printf("[%s:%d] ", __FILE__, __LINE__); \
   Serial.print(msg); \
   Serial.println(); \
   Serial.flush(); \
@@ -31,13 +32,22 @@
 #endif
 
 #if defined(ESP32)
-#  define WARN(msg) { Serial.print(F("[WARN] ")); Serial.println(msg); Serial.flush(); }
+#  define WARN(msg) { \
+  Serial.print(F("[WARN:")); \
+  Serial.printf("%s:%d] ", __FILE__, __LINE__); \
+  Serial.println(msg); \
+  Serial.flush(); \
+}
 #else
 #  define WARN(msg)
 #endif
 
 #if defined(ENABLE_SERIAL_DEBUG) && defined(ESP32)
-#  define SERIAL_DEBUG(msg) { Serial.print(F("[DEBUG] ")); Serial.println(msg); }
+#  define SERIAL_DEBUG(msg) { \
+  Serial.print(F("[DEBUG:")); \
+  Serial.printf("%s:%d] ", __FILE__, __LINE__); \
+  Serial.println(msg); \
+}
 #else
 #  define SERIAL_DEBUG(msg)
 #endif
