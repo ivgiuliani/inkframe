@@ -149,6 +149,7 @@ public:
 
   inline void refresh() const {
     while(display->nextPage()) {};
+    display->powerOff();
   }
 
 private:
