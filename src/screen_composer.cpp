@@ -10,6 +10,7 @@
 #include "wikipedia.h"
 #include "micro_utils.h"
 #include "hw_global.h"
+#include "ui.h"
 
 #include "icons/weather.bmp.h"
 #include "icons/generic.bmp.h"
@@ -195,13 +196,14 @@ void draw_secondary_weather(Display *display, std::array<weather_t,3> weather) {
   display->draw_text(String(tomorrow.wind_speed) + "m/s", 599, 250);
 }
 
-void draw_date(Display *display, uint32_t now_utc_timestamp) {
+void draw_date(UIBox *root, uint32_t now_utc_timestamp) {
   char buff[11]; // +1 for the `\0` terminator
   snprintf(buff, sizeof(buff), "%02d/%02d/%d",
     day(now_utc_timestamp), month(now_utc_timestamp), year(now_utc_timestamp));
 
-  display->set_font(&UbuntuMonoBold20pt8b);
-  display->draw_text(buff, 40, 45);
+  auto textbox = root->insert_relative<UITextBox>(40, 45, 500, 500);
+  textbox->set_font(&UbuntuMonoBold20pt8b);
+  textbox->set_text(buff);
 }
 
 void draw_wikipedia(Display *display, struct wikipedia_onthisday_t on_this_day) {
@@ -219,14 +221,16 @@ void draw_wikipedia(Display *display, struct wikipedia_onthisday_t on_this_day) 
 }
 
 void update_display(Display *display, screen_t screen) {
+  UIBox root(display, 0, 0, display->width(), display->height());
   display->new_frame();
 
-  draw_date(display, screen.current_time.unixtime());
+  draw_date(&root, screen.current_time.unixtime());
 
   draw_tfl_data(display, screen);
   draw_current_weather(display, screen, screen.current_weather);
   draw_secondary_weather(display, screen.next_three_days_weather);
   draw_wikipedia(display, screen.wikipedia_entry);
 
+  root.render();
   display->refresh();
 }
