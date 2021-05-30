@@ -53,15 +53,17 @@ bool RTC::adjust(const uint32_t timeout_ms) {
     }
   } while (((millis() - start) <= timeout_ms) && !sync_complete);
 
-  rtc.adjust(DateTime(
-    time_info.tm_year + 1900, // Years since 1900
-    time_info.tm_mon + 1, // Surprisingly, this is 0 indexed...
-    time_info.tm_mday,
-    time_info.tm_hour,
-    time_info.tm_min,
-    time_info.tm_sec));
+  if (!sync_complete) {
+    WARN("Could not update RTC from NTP servers: request timed out");
+  } else {
+    rtc.adjust(DateTime(
+      time_info.tm_year + 1900, // Years since 1900
+      time_info.tm_mon + 1, // Surprisingly, this is 0 indexed...
+      time_info.tm_mday,
+      time_info.tm_hour,
+      time_info.tm_min,
+      time_info.tm_sec));
 
-  if (sync_complete) {
     RTC_LAST_UPDATE = rtc.now().unixtime();
   }
 
