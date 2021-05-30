@@ -38,6 +38,14 @@ public:
     new_frame();
   }
 
+  constexpr int16_t width() {
+    return __DisplayType::WIDTH;
+  }
+
+  constexpr int16_t height() {
+    return __DisplayType::HEIGHT;
+  }
+
   // Sets some decent defaults for an empty new frame
   inline void new_frame(const uint8_t orientation = DISPLAY_ORIENT_LANDSCAPE) const {
     display->setCursor(0, 0);
