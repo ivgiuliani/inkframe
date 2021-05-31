@@ -177,29 +177,24 @@ void draw_current_weather(UIBox *root, screen_t screen, weather_t current) {
     String(current.wind_speed) + "m/s", &UbuntuMedium12pt8b);
 }
 
-void draw_secondary_weather(Display *display, std::array<weather_t,3> weather) {
+void draw_secondary_weather(UIBox *root, std::array<weather_t,3> weather) {
   const weather_t tomorrow = weather[0];
+  const unsigned char *weather_icon = get_weather_icon(tomorrow.weather, false, false);
 
-  BWBitmap weather_icon = get_weather_icon(tomorrow.weather, false, false);
-  BWBitmap temperature = BWBitmap(generic_bmp_thermometer_24px);
-  BWBitmap humidity = BWBitmap(generic_bmp_humidity_24px);
-  BWBitmap wind = BWBitmap(generic_bmp_wind_24px);
+  auto current_box = root->insert_relative<UIBox>(390, 185);
+  current_box->insert_relative<UITextBox>(0, 0)->set("Tomorrow", &UbuntuBold9pt8b);
+  current_box->insert_relative<UIBitmap>(15, 15)->set(weather_icon);
 
-  display->set_font(&UbuntuBold9pt8b);
-  display->draw_text("Tomorrow", 390, 185);
+  current_box->insert_relative<UIBitmap>(100, 12)->set(generic_bmp_thermometer_24px);
+  current_box->insert_relative<UITextBox>(125, 29)->set(
+    String("Min: ") + String(tomorrow.min_temp_c) + "° / " +
+    String("Max: " ) + String(tomorrow.max_temp_c) + "°", &UbuntuMedium9pt8b);
 
-  display->set_font(&UbuntuMedium9pt8b);
-  display->draw_bitmap(&weather_icon, 405, 200);
+  current_box->insert_relative<UIBitmap>(100, 50)->set(generic_bmp_humidity_24px);
+  current_box->insert_relative<UITextBox>(125, 65)->set(String(tomorrow.humidity) + "%", &UbuntuMedium9pt8b);
 
-  display->draw_bitmap(&temperature, 490, 197);
-  display->draw_text(String("Min: ") + String(tomorrow.min_temp_c) + "° / " +
-                     String("Max: " ) + String(tomorrow.max_temp_c) + "°", 515, 214);
-
-  display->draw_bitmap(&humidity, 490, 235);
-  display->draw_text(String(tomorrow.humidity) + "%", 515, 250);
-
-  display->draw_bitmap(&wind, 570, 235);
-  display->draw_text(String(tomorrow.wind_speed) + "m/s", 599, 250);
+  current_box->insert_relative<UIBitmap>(180, 50)->set(generic_bmp_wind_24px);
+  current_box->insert_relative<UITextBox>(209, 65)->set(String(tomorrow.wind_speed) + "m/s", &UbuntuMedium9pt8b);
 }
 
 void draw_date(UIBox *root, uint32_t now_utc_timestamp) {
@@ -232,7 +227,7 @@ void update_display(Display *display, screen_t screen) {
 
   draw_tfl_data(&root, screen);
   draw_current_weather(&root, screen, screen.current_weather);
-  draw_secondary_weather(display, screen.next_three_days_weather);
+  draw_secondary_weather(&root, screen.next_three_days_weather);
   draw_wikipedia(display, screen.wikipedia_entry);
 
   root.render();
