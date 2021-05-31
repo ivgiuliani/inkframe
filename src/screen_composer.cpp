@@ -204,8 +204,10 @@ void draw_wikipedia(UIBox *root, struct wikipedia_onthisday_t on_this_day) {
     header += String(-on_this_day.year) + " B.C";
   }
 
-  root->insert_relative<UITextBox>(390, 300)->set(header, &UbuntuBold9pt8b);
-  root->insert_relative<UIMultilineTextBox>(390, 325, 280)->set(
+  auto display_header = root->insert_relative<UITextBox>(390, 300);
+  display_header->set(header, &UbuntuBold9pt8b);
+
+  root->insert_below<UIMultilineTextBox>(display_header, 25, 280)->set(
     on_this_day.text.c_str(), &UbuntuMedium9pt8b
   );
 }

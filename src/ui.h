@@ -24,6 +24,12 @@ public:
     display(display), x(x), y(y), w(w), h(h) {}
 
   virtual void render();
+
+  inline uint16_t _x() { return x; }
+  inline uint16_t _y() { return y; }
+  inline uint16_t _w() { return w; }
+  inline uint16_t _h() { return h; }
+
 protected:
   Display *display;
   const uint16_t x, y, w, h;
@@ -61,6 +67,26 @@ public:
 
     add(t);
     return t;
+  }
+
+  template<class T>
+  std::shared_ptr<T> insert_below(std::shared_ptr<UIItem> ref, int16_t below, const int16_t w = UI_FILL, const int16_t h = UI_FILL) {
+    return insert_relative<T>(ref->_x(), ref->_y() + below, w, h);
+  }
+
+  template<class T>
+  std::shared_ptr<T> insert_above(std::shared_ptr<UIItem> ref, int16_t above, const int16_t w = UI_FILL, const int16_t h = UI_FILL) {
+    return insert_relative<T>(ref->_x(), ref->_y() - above, w, h);
+  }
+
+  template<class T>
+  std::shared_ptr<T> insert_left_of(std::shared_ptr<UIItem> ref, int16_t left, const int16_t w = UI_FILL, const int16_t h = UI_FILL) {
+    return insert_relative<T>(ref->_x() - left, ref->_y(), w, h);
+  }
+
+  template<class T>
+  std::shared_ptr<T> insert_right_of(std::shared_ptr<UIItem> ref, int16_t right, const int16_t w = UI_FILL, const int16_t h = UI_FILL) {
+    return insert_relative<T>(ref->_x() + right, ref->_y(), w, h);
   }
 
 protected:
