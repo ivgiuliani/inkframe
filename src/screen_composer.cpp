@@ -92,7 +92,7 @@ typedef struct {
   const unsigned char *large_night;
 } BitmapMapEntry;
 
-BWBitmap get_weather_icon(const Weather weather, const bool large, const bool night) {
+const unsigned char *get_weather_icon(const Weather weather, const bool large, const bool night) {
   const unsigned char *entry = NULL;
   const BitmapMapEntry entries[] = {
     { DRIZZLE,
@@ -152,29 +152,29 @@ BWBitmap get_weather_icon(const Weather weather, const bool large, const bool ni
     PANIC("Invalid weather request");
   }
 
-  return BWBitmap(entry);
+  return entry;
 }
 
-void draw_current_weather(Display *display, screen_t screen, weather_t current) {
+void draw_current_weather(UIBox *root, screen_t screen, weather_t current) {
   const bool night_variant = screen.current_time.hour() >= 19 || screen.current_time.hour() <= 4;
-  BWBitmap bmp = get_weather_icon(current.weather, true, night_variant);
-  display->draw_bitmap(&bmp, 390, 20);
+  const unsigned char *weather_icon = get_weather_icon(current.weather, true, night_variant);
 
-  BWBitmap home_temperature = BWBitmap(generic_bmp_house_thermometer_32px);
-  BWBitmap temperature = BWBitmap(generic_bmp_thermometer_32px);
-  BWBitmap humidity = BWBitmap(generic_bmp_humidity_32px);
-  BWBitmap wind = BWBitmap(generic_bmp_wind_32px);
+  auto current_box = root->insert_relative<UIBox>(390, 20);
+  current_box->insert_relative<UIBitmap>(0, 0)->set(weather_icon);
 
-  display->draw_bitmap(&home_temperature, 560, 15);
-  display->draw_bitmap(&temperature, 560, 51);
-  display->draw_bitmap(&humidity, 560, 85);
-  display->draw_bitmap(&wind, 560, 119);
+  current_box->insert_relative<UIBitmap>(170, 15)->set(generic_bmp_house_thermometer_32px);
+  current_box->insert_relative<UIBitmap>(170, 51)->set(generic_bmp_thermometer_32px);
+  current_box->insert_relative<UIBitmap>(170, 85)->set(generic_bmp_humidity_32px);
+  current_box->insert_relative<UIBitmap>(170, 119)->set(generic_bmp_wind_32px);
 
-  display->set_font(&UbuntuMedium12pt8b);
-  display->draw_text(String(screen.home_temperature) + "°", 605, 36);
-  display->draw_text(String(current.min_temp_c) + "°", 605, 72);
-  display->draw_text(String(current.humidity) + "%", 605, 108);
-  display->draw_text(String(current.wind_speed) + "m/s", 605, 144);
+  current_box->insert_relative<UITextBox>(215, 36)->set(
+    String(screen.home_temperature) + "°", &UbuntuMedium12pt8b);
+  current_box->insert_relative<UITextBox>(215, 72)->set(
+    String(current.min_temp_c) + "°", &UbuntuMedium12pt8b);
+  current_box->insert_relative<UITextBox>(215, 108)->set(
+    String(current.min_temp_c) + "°", &UbuntuMedium12pt8b);
+  current_box->insert_relative<UITextBox>(215, 144)->set(
+    String(current.wind_speed) + "m/s", &UbuntuMedium12pt8b);
 }
 
 void draw_secondary_weather(Display *display, std::array<weather_t,3> weather) {
@@ -207,9 +207,7 @@ void draw_date(UIBox *root, uint32_t now_utc_timestamp) {
   snprintf(buff, sizeof(buff), "%02d/%02d/%d",
     day(now_utc_timestamp), month(now_utc_timestamp), year(now_utc_timestamp));
 
-  auto textbox = root->insert_relative<UITextBox>(40, 45);
-  textbox->set_font(&UbuntuMonoBold20pt8b);
-  textbox->set_text(buff);
+  root->insert_relative<UITextBox>(40, 45)->set(buff, &UbuntuMonoBold20pt8b);
 }
 
 void draw_wikipedia(Display *display, struct wikipedia_onthisday_t on_this_day) {
@@ -233,7 +231,7 @@ void update_display(Display *display, screen_t screen) {
   draw_date(&root, screen.current_time.unixtime());
 
   draw_tfl_data(&root, screen);
-  draw_current_weather(display, screen, screen.current_weather);
+  draw_current_weather(&root, screen, screen.current_weather);
   draw_secondary_weather(display, screen.next_three_days_weather);
   draw_wikipedia(display, screen.wikipedia_entry);
 

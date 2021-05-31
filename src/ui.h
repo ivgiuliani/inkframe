@@ -78,6 +78,11 @@ class UITextBox : virtual public UIItem {
 public:
   __UI_CONSTRUCTOR(TextBox) {}
 
+  void set(String text, const GFXfont *font) {
+    set_text(text);
+    set_font(font);
+  }
+
   void set_text(std::string text) {
     this->text = String(text.c_str());
   }
@@ -105,6 +110,22 @@ public:
 private:
   const GFXfont *font = NULL;
   String text;
+};
+
+class UIBitmap : virtual public UIItem {
+public:
+  __UI_CONSTRUCTOR(Bitmap) {}
+
+  void set(const unsigned char *bmp) {
+    bitmap = std::make_shared<BWBitmap>(bmp);
+  }
+
+  void render() {
+    display->draw_bitmap(bitmap.get(), x, y);
+  }
+
+private:
+  std::shared_ptr<BWBitmap> bitmap;
 };
 
 #endif // __UI_H
