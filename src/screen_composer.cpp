@@ -62,17 +62,23 @@ struct screen_t update_screen_data() {
   return screen;
 }
 
-void draw_tfl_data(Display *display, screen_t screen) {
   // Tfl data sits in the left half of the screen
-  uint16_t start_height = 80;
+void draw_tfl_data(UIBox *root, screen_t screen) {
+  auto status_box = root->insert_relative<UIBox>(42, 80, 440, 1000);
+
+  uint16_t start_height = 0;
 
   std::map<String, String>::iterator it = screen.tube_status.begin();
   while (it != screen.tube_status.end()) {
-    display->set_font(&UbuntuBold9pt8b);
-    display->draw_text(it->first, 42, start_height);
+    auto line_name = status_box->insert_relative<UITextBox>(0, start_height, 200, 1000);
+    auto line_status = status_box->insert_relative<UITextBox>(185, start_height, 200, 1000);
 
-    display->set_font(&UbuntuMedium9pt8b);
-    display->draw_text(it->second, 227, start_height);
+    line_name->set_font(&UbuntuBold9pt8b);
+    line_name->set_text(it->first);
+
+    line_name->set_font(&UbuntuMedium9pt8b);
+    line_status->set_text(it->second);
+
     start_height += 34;
     it++;
   }
@@ -226,7 +232,7 @@ void update_display(Display *display, screen_t screen) {
 
   draw_date(&root, screen.current_time.unixtime());
 
-  draw_tfl_data(display, screen);
+  draw_tfl_data(&root, screen);
   draw_current_weather(display, screen, screen.current_weather);
   draw_secondary_weather(display, screen.next_three_days_weather);
   draw_wikipedia(display, screen.wikipedia_entry);
