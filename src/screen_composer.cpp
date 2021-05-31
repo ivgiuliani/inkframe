@@ -9,6 +9,7 @@
 #include "rtc.h"
 #include "wikipedia.h"
 #include "micro_utils.h"
+#include "hw_global.h"
 
 #include "icons/weather.bmp.h"
 #include "icons/generic.bmp.h"
@@ -25,14 +26,14 @@
 #include "fonts/UbuntuBold9pt8b.h"
 #include "fonts/UbuntuBold12pt8b.h"
 
-struct screen_t update_screen_data(RTC *rtc) {
+struct screen_t update_screen_data() {
   struct screen_t screen;
 
   HTTPClient client;
   std::array<weather_t, 4> forecasts = get_weather_forecast(&client);
 
-  screen.current_time = rtc->now();
-  screen.home_temperature = std::lround(rtc->get_temperature());
+  screen.current_time = HW.rtc.now();
+  screen.home_temperature = std::lround(HW.rtc.get_temperature());
 
   screen.current_weather = forecasts[0];
   screen.next_three_days_weather = { forecasts[1], forecasts[2], forecasts[3] };
@@ -54,7 +55,7 @@ struct screen_t update_screen_data(RTC *rtc) {
   screen.tube_status = tfl_get_status(&client, tfl_line_collection<12>(lines));
 
   screen.wikipedia_entry = wikipedia_get_onthisday(&client,
-    rtc->now().month(), rtc->now().day()
+    HW.rtc.now().month(), HW.rtc.now().day()
   );
 
   return screen;

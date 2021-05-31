@@ -6,23 +6,25 @@
 #include <buttonctrl.h>
 #include "rotary_encoder.h"
 
+#include "hw_global.h"
+
 #include "screen_composer.h"
 
 Display display;
 Connectivity connectivity;
-RTC rtc;
-ButtonCtrl<PIN_RE_BUTTON, HIGH, INPUT_PULLUP> button;
-RotaryEncoder<PIN_RE_CLK, PIN_RE_DT> rotary_encoder;
+// RTC rtc;
+// ButtonCtrl<PIN_RE_BUTTON, HIGH, INPUT_PULLUP> button;
+// RotaryEncoder<PIN_RE_CLK, PIN_RE_DT> rotary_encoder;
 
 void handleInputTask(void *pvTaskArgs) {
   for(;;) {
-    const ButtonEvent btn_ev = button.handle();
+    const ButtonEvent btn_ev = HW.button.handle();
 
     if (btn_ev != None) {
-      Serial.printf("Button: %s\n", button.str_from_event(btn_ev));
+      Serial.printf("Button: %s\n", HW.button.str_from_event(btn_ev));
     }
 
-    const int8_t offset = rotary_encoder.read_offset();
+    const int8_t offset = HW.rotary_encoder.read_offset();
     if (offset != 0) {
       Serial.printf("Rotary encoder: %d\n", offset);
     }
@@ -40,10 +42,11 @@ void setup() {
   Serial.println(F("booting..."));
 
   pinMode(LED_BUILTIN, OUTPUT);
-  rtc.begin();
+  HW.rtc.begin();
+  HW.button.begin();
+  HW.rotary_encoder.begin();
+
   display.begin();
-  button.begin();
-  rotary_encoder.begin();
   connectivity.attempt_wifi_connection();
 
   Serial.println(F("inkframe started."));
@@ -61,7 +64,7 @@ void setup() {
 
 void refresh() {
   digitalWrite(LED_BUILTIN, HIGH);
-  screen_t screen_details = update_screen_data(&rtc);
+  screen_t screen_details = update_screen_data();
   update_display(&display, screen_details);
   digitalWrite(LED_BUILTIN, LOW);
 }
@@ -77,9 +80,9 @@ void loop() {
 
   if (!connectivity.is_connected()) return;
 
-  if (rtc.needs_adjustment()) {
+  if (HW.rtc.needs_adjustment()) {
     SERIAL_DEBUG("RTC needs to be updated");
-    rtc.adjust();
+    HW.rtc.adjust();
   }
 
   refresh();

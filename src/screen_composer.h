@@ -19,7 +19,7 @@ struct screen_t {
   struct wikipedia_onthisday_t wikipedia_entry;
 };
 
-struct screen_t update_screen_data(RTC *);
+struct screen_t update_screen_data();
 void update_display(Display *, screen_t);
 
 #endif // __SCREEN_COMPOSER_H
