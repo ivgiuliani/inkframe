@@ -11,6 +11,8 @@
   UI##name(Display *display, const uint16_t x, const uint16_t y, const uint16_t w, const uint16_t h) : \
   UIItem { display, x, y, w, h }
 
+#define UI_FILL (-1)
+
 class UIItem {
 public:
   // Coordinates for a UIItem are always absolute.
@@ -39,7 +41,7 @@ public:
   }
 
   template<class T>
-  std::shared_ptr<T> insert_relative(const int16_t x, const int16_t y, const int16_t w, const int16_t h) {
+  std::shared_ptr<T> insert_relative(const int16_t x, const int16_t y, const int16_t w = UI_FILL, const int16_t h = UI_FILL) {
     static_assert(std::is_base_of<UIItem, T>::value, "T not derived from UIItem");
 
     int16_t new_x = this->x + x;
@@ -52,8 +54,8 @@ public:
 
     const int16_t max_width = new_x - display->width();
     const int16_t max_height = new_y - display->height();
-    const auto new_w = min(w, max_width);
-    const auto new_h = min(h, max_height);
+    const auto new_w = min(w == UI_FILL ? max_width : w, max_width);
+    const auto new_h = min(h == UI_FILL ? max_height : h, max_height);
 
     // TODO: clip width/height if it exceeds display boundaries
 

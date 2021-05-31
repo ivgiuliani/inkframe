@@ -70,8 +70,8 @@ void draw_tfl_data(UIBox *root, screen_t screen) {
 
   std::map<String, String>::iterator it = screen.tube_status.begin();
   while (it != screen.tube_status.end()) {
-    auto line_name = status_box->insert_relative<UITextBox>(0, start_height, 200, 1000);
-    auto line_status = status_box->insert_relative<UITextBox>(185, start_height, 200, 1000);
+    auto line_name = status_box->insert_relative<UITextBox>(0, start_height);
+    auto line_status = status_box->insert_relative<UITextBox>(185, start_height);
 
     line_name->set_font(&UbuntuBold9pt8b);
     line_name->set_text(it->first);
@@ -207,7 +207,7 @@ void draw_date(UIBox *root, uint32_t now_utc_timestamp) {
   snprintf(buff, sizeof(buff), "%02d/%02d/%d",
     day(now_utc_timestamp), month(now_utc_timestamp), year(now_utc_timestamp));
 
-  auto textbox = root->insert_relative<UITextBox>(40, 45, 500, 500);
+  auto textbox = root->insert_relative<UITextBox>(40, 45);
   textbox->set_font(&UbuntuMonoBold20pt8b);
   textbox->set_text(buff);
 }
