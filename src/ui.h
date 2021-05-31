@@ -72,6 +72,22 @@ private:
   std::vector<std::shared_ptr<UIItem>> children;
 };
 
+/**
+ * A special kind of `UIBox` that will also refresh the linked display.
+ */
+class UIRoot : public UIBox {
+public:
+  UIRoot(Display *display) :
+    UIItem(display, 0, 0, display->width(), display->height()),
+    UIBox(display, 0, 0, display->width(), display->height()) {}
+
+  void render() {
+    display->new_frame();
+    UIBox::render();
+    display->refresh();
+  }
+};
+
 class UITextBox : virtual public UIItem {
 public:
   __UI_CONSTRUCTOR(TextBox) {}

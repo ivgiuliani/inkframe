@@ -17,15 +17,10 @@
 
 // Due to a bug in the GFX library from Adafruit, these must be included *after*
 // the include of display.h
-#include "fonts/UbuntuMonoBold9pt8b.h"
-#include "fonts/UbuntuMonoRegular9pt8b.h"
 #include "fonts/UbuntuMonoBold20pt8b.h"
-#include "fonts/UbuntuRegular9pt8b.h"
 #include "fonts/UbuntuMedium9pt8b.h"
-#include "fonts/UbuntuMedium11pt8b.h"
 #include "fonts/UbuntuMedium12pt8b.h"
 #include "fonts/UbuntuBold9pt8b.h"
-#include "fonts/UbuntuBold12pt8b.h"
 
 struct screen_t update_screen_data() {
   struct screen_t screen;
@@ -216,8 +211,7 @@ void draw_wikipedia(UIBox *root, struct wikipedia_onthisday_t on_this_day) {
 }
 
 void update_display(Display *display, screen_t screen) {
-  UIBox root(display, 0, 0, display->width(), display->height());
-  display->new_frame();
+  UIRoot root(display);
 
   draw_date(&root, screen.current_time.unixtime());
 
@@ -227,5 +221,4 @@ void update_display(Display *display, screen_t screen) {
   draw_wikipedia(&root, screen.wikipedia_entry);
 
   root.render();
-  display->refresh();
 }
