@@ -163,7 +163,7 @@ void draw_current_weather(UIBox *root, screen_t screen, weather_t current) {
   current_box->insert_relative<UITextBox>(215, 72)->set(
     String(current.min_temp_c) + "°", &UbuntuMedium12pt8b);
   current_box->insert_relative<UITextBox>(215, 108)->set(
-    String(current.min_temp_c) + "°", &UbuntuMedium12pt8b);
+    String(current.humidity) + "%", &UbuntuMedium12pt8b);
   current_box->insert_relative<UITextBox>(215, 144)->set(
     String(current.wind_speed) + "m/s", &UbuntuMedium12pt8b);
 }
