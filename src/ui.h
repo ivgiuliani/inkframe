@@ -52,12 +52,10 @@ public:
     if (new_x >= display->width()) new_x = display->width();
     if (new_y >= display->height()) new_y = display->height();
 
-    const int16_t max_width = new_x - display->width();
-    const int16_t max_height = new_y - display->height();
+    const int16_t max_width = display->width() - new_x;
+    const int16_t max_height = display->height() - new_y;
     const auto new_w = min(w == UI_FILL ? max_width : w, max_width);
     const auto new_h = min(h == UI_FILL ? max_height : h, max_height);
-
-    // TODO: clip width/height if it exceeds display boundaries
 
     auto t = std::make_shared<T>(display, new_x, new_y, new_w, new_h);
 
@@ -79,32 +77,32 @@ public:
   __UI_CONSTRUCTOR(TextBox) {}
 
   void set(String text, const GFXfont *font) {
-    set_text(text);
-    set_font(font);
-  }
-
-  void set_text(std::string text) {
-    this->text = String(text.c_str());
-  }
-
-  void set_text(String text) {
     this->text = text;
-  }
-
-  void set_text(const char *text) {
-    this->set_text(std::string(text));
-  }
-
-  void set_font(const GFXfont *font) {
     this->font = font;
   }
 
   void render() {
-    if (font != NULL) {
-      // TODO: we should always enforce an explicit font choice
-      display->set_font(font);
-    }
+    display->set_font(font);
     display->draw_text(text, x, y);
+  }
+
+private:
+  const GFXfont *font = NULL;
+  String text;
+};
+
+class UIMultilineTextBox : virtual public UIItem {
+public:
+  __UI_CONSTRUCTOR(MultilineTextBox) {}
+
+  void set(String text, const GFXfont *font) {
+    this->text = text;
+    this->font = font;
+  }
+
+  void render() {
+    display->set_font(font);
+    display->draw_text(text, x, y, w);
   }
 
 private:

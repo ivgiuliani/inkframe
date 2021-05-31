@@ -70,14 +70,10 @@ void draw_tfl_data(UIBox *root, screen_t screen) {
 
   std::map<String, String>::iterator it = screen.tube_status.begin();
   while (it != screen.tube_status.end()) {
-    auto line_name = status_box->insert_relative<UITextBox>(0, start_height);
-    auto line_status = status_box->insert_relative<UITextBox>(185, start_height);
-
-    line_name->set_font(&UbuntuBold9pt8b);
-    line_name->set_text(it->first);
-
-    line_name->set_font(&UbuntuMedium9pt8b);
-    line_status->set_text(it->second);
+    status_box->insert_relative<UITextBox>(0, start_height)->
+      set(it->first, &UbuntuBold9pt8b);
+    status_box->insert_relative<UITextBox>(185, start_height)->
+      set(it->second, &UbuntuMedium9pt8b);
 
     start_height += 34;
     it++;
@@ -205,18 +201,18 @@ void draw_date(UIBox *root, uint32_t now_utc_timestamp) {
   root->insert_relative<UITextBox>(40, 45)->set(buff, &UbuntuMonoBold20pt8b);
 }
 
-void draw_wikipedia(Display *display, struct wikipedia_onthisday_t on_this_day) {
+void draw_wikipedia(UIBox *root, struct wikipedia_onthisday_t on_this_day) {
   String header = String("Happened on this day in ");
   if (on_this_day.year >= 0) {
     header += String(on_this_day.year);
   } else {
     header += String(-on_this_day.year) + " B.C";
   }
-  display->set_font(&UbuntuBold9pt8b);
-  display->draw_text(header, 390, 300);
 
-  display->set_font(&UbuntuMedium9pt8b);
-  display->draw_text(on_this_day.text.c_str(), 390, 325, 280);
+  root->insert_relative<UITextBox>(390, 300)->set(header, &UbuntuBold9pt8b);
+  root->insert_relative<UIMultilineTextBox>(390, 325, 280)->set(
+    on_this_day.text.c_str(), &UbuntuMedium9pt8b
+  );
 }
 
 void update_display(Display *display, screen_t screen) {
@@ -228,7 +224,7 @@ void update_display(Display *display, screen_t screen) {
   draw_tfl_data(&root, screen);
   draw_current_weather(&root, screen, screen.current_weather);
   draw_secondary_weather(&root, screen.next_three_days_weather);
-  draw_wikipedia(display, screen.wikipedia_entry);
+  draw_wikipedia(&root, screen.wikipedia_entry);
 
   root.render();
   display->refresh();
