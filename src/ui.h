@@ -143,8 +143,12 @@ public:
   }
 
   void render() {
-    display->set_font(font);
-    display->draw_text(text, x, y);
+    DisplayT *gfx = display->get_display();
+
+    gfx->setCursor(x, y);
+    gfx->setFont(font);
+    gfx->setTextColor(GxEPD_BLACK);
+    gfx->print(text);
   }
 
 private:
