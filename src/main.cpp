@@ -12,9 +12,6 @@
 
 Display display;
 Connectivity connectivity;
-// RTC rtc;
-// ButtonCtrl<PIN_RE_BUTTON, HIGH, INPUT_PULLUP> button;
-// RotaryEncoder<PIN_RE_CLK, PIN_RE_DT> rotary_encoder;
 
 void handleInputTask(void *pvTaskArgs) {
   for(;;) {
