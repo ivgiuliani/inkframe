@@ -6,12 +6,18 @@
 #include <Arduino.h>
 
 #include "display.h"
+#include "micro_utils.h"
 
 #define __UI_CONSTRUCTOR(name) \
   UI##name(Display *display, const uint16_t x, const uint16_t y, const uint16_t w, const uint16_t h) : \
   UIItem { display, x, y, w, h }
 
 #define UI_FILL (-1)
+
+typedef struct {
+  int32_t x;
+  int32_t y;
+} ui_coords_t;
 
 class UIItem {
 public:
@@ -25,10 +31,28 @@ public:
 
   virtual void render();
 
-  inline uint16_t _x() { return x; }
-  inline uint16_t _y() { return y; }
-  inline uint16_t _w() { return w; }
-  inline uint16_t _h() { return h; }
+  __FORCE_INLINE uint16_t _x() { return x; }
+  __FORCE_INLINE uint16_t _y() { return y; }
+  __FORCE_INLINE uint16_t _w() { return w; }
+  __FORCE_INLINE uint16_t _h() { return h; }
+
+  /**
+   * Given the offsets, it will return the position of the _new_ object in
+   * absolute coordinates relative to the current UIItem.
+   **/
+  ui_coords_t calc_relative_position(int16_t x_offset, int16_t y_offset) {
+    ui_coords_t coords { x, y };
+
+    coords.x += x_offset;
+    coords.y += y_offset;
+
+    if (coords.x > display->width()) coords.x = display->width();
+    if (coords.y > display->height()) coords.y = display->height();
+    if (coords.x < 0) coords.x = 0;
+    if (coords.y < 0) coords.y = 0;
+
+    return coords;
+  }
 
 protected:
   Display *display;
@@ -50,41 +74,35 @@ public:
   std::shared_ptr<T> insert_relative(const int16_t x, const int16_t y, const int16_t w = UI_FILL, const int16_t h = UI_FILL) {
     static_assert(std::is_base_of<UIItem, T>::value, "T not derived from UIItem");
 
-    int16_t new_x = this->x + x;
-    int16_t new_y = this->y + y;
+    ui_coords_t new_coords = calc_relative_position(x, y);
 
-    if (new_x < 0) new_x = 0;
-    if (new_y < 0) new_y = 0;
-    if (new_x >= display->width()) new_x = display->width();
-    if (new_y >= display->height()) new_y = display->height();
-
-    const int16_t max_width = display->width() - new_x;
-    const int16_t max_height = display->height() - new_y;
+    const int16_t max_width = display->width() - new_coords.x;
+    const int16_t max_height = display->height() - new_coords.y;
     const auto new_w = min(w == UI_FILL ? max_width : w, max_width);
     const auto new_h = min(h == UI_FILL ? max_height : h, max_height);
 
-    auto t = std::make_shared<T>(display, new_x, new_y, new_w, new_h);
+    auto t = std::make_shared<T>(display, new_coords.x, new_coords.y, new_w, new_h);
 
     add(t);
     return t;
   }
 
-  template<class T>
+  template<class T> __FORCE_INLINE
   std::shared_ptr<T> insert_below(std::shared_ptr<UIItem> ref, int16_t below, const int16_t w = UI_FILL, const int16_t h = UI_FILL) {
     return insert_relative<T>(ref->_x(), ref->_y() + below, w, h);
   }
 
-  template<class T>
+  template<class T> __FORCE_INLINE
   std::shared_ptr<T> insert_above(std::shared_ptr<UIItem> ref, int16_t above, const int16_t w = UI_FILL, const int16_t h = UI_FILL) {
     return insert_relative<T>(ref->_x(), ref->_y() - above, w, h);
   }
 
-  template<class T>
+  template<class T> __FORCE_INLINE
   std::shared_ptr<T> insert_left_of(std::shared_ptr<UIItem> ref, int16_t left, const int16_t w = UI_FILL, const int16_t h = UI_FILL) {
     return insert_relative<T>(ref->_x() - left, ref->_y(), w, h);
   }
 
-  template<class T>
+  template<class T> __FORCE_INLINE
   std::shared_ptr<T> insert_right_of(std::shared_ptr<UIItem> ref, int16_t right, const int16_t w = UI_FILL, const int16_t h = UI_FILL) {
     return insert_relative<T>(ref->_x() + right, ref->_y(), w, h);
   }
