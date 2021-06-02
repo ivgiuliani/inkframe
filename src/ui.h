@@ -71,13 +71,14 @@ public:
   }
 
   template<class T>
-  std::shared_ptr<T> insert_relative(const int16_t x, const int16_t y, const int16_t w = UI_FILL, const int16_t h = UI_FILL) {
+  std::shared_ptr<T> insert_relative(const int16_t x, const int16_t y,
+                                     const int16_t w = UI_FILL, const int16_t h = UI_FILL) {
     static_assert(std::is_base_of<UIItem, T>::value, "T not derived from UIItem");
 
     ui_coords_t new_coords = calc_relative_position(x, y);
 
-    const int16_t max_width = display->width() - new_coords.x;
-    const int16_t max_height = display->height() - new_coords.y;
+    const int16_t max_width = _x() + _w() - new_coords.x;
+    const int16_t max_height = _y() + _h() - new_coords.y;
     const auto new_w = min(w == UI_FILL ? max_width : w, max_width);
     const auto new_h = min(h == UI_FILL ? max_height : h, max_height);
 

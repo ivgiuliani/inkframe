@@ -59,7 +59,7 @@ struct screen_t update_screen_data() {
 
   // Tfl data sits in the left half of the screen
 void draw_tfl_data(UIBox *root, screen_t screen) {
-  auto status_box = root->insert_relative<UIBox>(42, 80, 440, 1000);
+  auto status_box = root->insert_relative<UIBox>(42, 80, 360, 1000);
 
   uint16_t start_height = 0;
 
