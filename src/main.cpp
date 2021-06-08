@@ -8,7 +8,7 @@
 
 #include "hw_global.h"
 
-#include "screen_composer.h"
+#include "screen_coordinator.h"
 
 Display display;
 Connectivity connectivity;
@@ -61,8 +61,7 @@ void setup() {
 
 void refresh() {
   digitalWrite(LED_BUILTIN, HIGH);
-  screen_t screen_details = update_screen_data();
-  update_display(&display, screen_details);
+  auto sc = ScreenCoordinator(&display);
   digitalWrite(LED_BUILTIN, LOW);
 }
 

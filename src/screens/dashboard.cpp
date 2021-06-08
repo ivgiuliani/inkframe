@@ -4,13 +4,13 @@
 
 #include "weather.h"
 #include "tfl.h"
-#include "screen_composer.h"
 #include "display.h"
 #include "rtc.h"
 #include "wikipedia.h"
 #include "micro_utils.h"
 #include "hw_global.h"
 #include "ui.h"
+#include "dashboard.h"
 
 #include "icons/weather.bmp.h"
 #include "icons/generic.bmp.h"
@@ -34,9 +34,9 @@ struct screen_t update_screen_data() {
   screen.current_weather = forecasts[0];
   screen.next_three_days_weather = { forecasts[1], forecasts[2], forecasts[3] };
 
-  std::array<String, 12> lines{
+  std::array<String, 10> lines{
     TUBE_LINE_DLR,
-    TUBE_LINE_BAKERLOO,
+    // TUBE_LINE_BAKERLOO,
     TUBE_LINE_CENTRAL,
     TUBE_LINE_CIRCLE,
     TUBE_LINE_DISTRICT,
@@ -46,9 +46,9 @@ struct screen_t update_screen_data() {
     TUBE_LINE_PICCADILLY,
     TUBE_LINE_VICTORIA,
     TUBE_LINE_JUBILEE,
-    TUBE_LINE_WATERLOO,
+    // TUBE_LINE_WATERLOO,
   };
-  screen.tube_status = tfl_get_status(&client, tfl_line_collection<12>(lines));
+  screen.tube_status = tfl_get_status(&client, tfl_line_collection<10>(lines));
 
   screen.wikipedia_entry = wikipedia_get_onthisday(&client,
     HW.rtc.now().month(), HW.rtc.now().day()
@@ -223,4 +223,9 @@ void update_display(Display *display, screen_t screen) {
   draw_wikipedia(&root, screen.wikipedia_entry);
 
   root.render();
+}
+
+void Screen::Dashboard::setup(Display *display) {
+  screen_t screen_data = update_screen_data();
+  update_display(display, screen_data);
 }

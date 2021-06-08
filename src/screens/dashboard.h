@@ -1,9 +1,10 @@
-#ifndef __SCREEN_COMPOSER_H
-#define __SCREEN_COMPOSER_H
+#ifndef __SCREEN_DASHBOARD_H
+#define __SCREEN_DASHBOARD_H
 
 #include <map>
 #include <Arduino.h>
 
+#include "base.h"
 #include "display.h"
 #include "weather.h"
 #include "rtc.h"
@@ -19,7 +20,12 @@ struct screen_t {
   struct wikipedia_onthisday_t wikipedia_entry;
 };
 
-struct screen_t update_screen_data();
-void update_display(Display *, screen_t);
+namespace Screen {
+  class Dashboard : public BaseScreen {
+    void setup(Display *);
+    void unload() {};
+    void handle() {};
+  };
+};
 
-#endif // __SCREEN_COMPOSER_H
+#endif // __SCREEN_DASHBOARD_H
