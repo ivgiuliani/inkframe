@@ -61,7 +61,7 @@ void setup() {
 
 void refresh() {
   digitalWrite(LED_BUILTIN, HIGH);
-  auto sc = ScreenCoordinator(&display);
+  auto sc = ScreenCoordinator(&display, SETUP);
   digitalWrite(LED_BUILTIN, LOW);
 }
 
